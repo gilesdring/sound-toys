@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOUNDTOYS :: XY THEREMIN</title>
+  <style>
+    * {
+      font-family: monospace;
+      margin: 0;
+      padding: 0;
+    }
+
+    #control-surface {
+      /* width: 100%; */
+      height: 400px;
+      background: grey;
+    }
+
+    body>* {
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0.5em 1em;
+      background: orange;
+      max-width: 500px;
+    }
+
+    main {
+      padding: 1em;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>XY THEREMIN</h1>
+  </header>
+  <aside>
+    <p>Click or touch on the grey area play.</p>
+    <p>Move left and right to change pitch.</p>
+    <p>Move up and down to change volume.</p>
+    <p>Click again or release your finger to stop.</p>
+  </aside>
+  <main role="main">
+    <div id="control-surface"></div>
+  </main>
+  <script>
+    (function () {
+      var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const sampleRate = audioCtx.sampleRate;
+
+      var myArrayBuffer = audioCtx.createBuffer(2, sampleRate, sampleRate);
+      var gainNode = audioCtx.createGain();
+      gainNode.connect(audioCtx.destination);
+
+      /**
+       * Sine wave generator function
+       */
+      function* sineGen(frequency, sampleRate) {
+        const r = sampleRate || audioCtx.sampleRate;
+        let step = 0;
+        const segment = Math.PI / r * frequency;
+        do {
+          yield Math.sin(step * segment);
+          step++;
+        } while (true)
+      }
+
+      /**
+       * Square wave generator
+       */
+      function* squareGen(frequency, sampleRate) {
+        const r = sampleRate || audioCtx.sampleRate;
+        let step = 0;
+        const w = r / frequency;
+        do {
+          yield (step % w) / w < 0.5 ? 1 : -1;
+          step++;
+        } while (true)
+      }
+
+      // Fill the buffer with white noise;
+      // just random values between -1.0 and 1.0
+      const wave = squareGen(1000)
+      for (var channel = 0; channel < myArrayBuffer.numberOfChannels; channel++) {
+        // This gives us the actual array that contains the data
+        var nowBuffering = myArrayBuffer.getChannelData(channel);
+        for (var i = 0; i < myArrayBuffer.length; i++) {
+          nowBuffering[i] = wave.next().value;
+        }
+      }
+
+      let source;
+      const play = () => {
+        if (Boolean(source)) source.stop();
+        source = audioCtx.createBufferSource();
+        source.loop = true;
+        source.buffer = myArrayBuffer;
+        source.connect(gainNode);
+        source.start();
+      }
+      const stop = () => source.stop();
+
+      const setPitchAndVolume = (e) => {
+        e.preventDefault();
+        if (!Boolean(source)) return;
+        var offset = e.target.getBoundingClientRect();
+        var xPos = e.pageX || e.touches[0].clientX;
+        var yPos = e.pageY || e.touches[0].clientX;
+        var pos = {
+          x: xPos - offset.left,
+          y: yPos - offset.top,
+        }
+        const freq = 10 ** (1.5 * (pos.x / offset.width) - 1);
+        const gain = 1 - (pos.y / offset.height);
+        source.playbackRate.value = freq;
+        gainNode.gain.value = gain;
+      }
+      let playing;
+      const toggle = () => {
+        if (!Boolean(playing)) {
+          playing = true;
+          play();
+        } else {
+          playing = false;
+          stop();
+        }
+      }
+
+      // document.querySelector('#control-surface').addEventListener("click", (e) => { toggle(); setPitchAndVolume(e); });
+      // document.querySelector('#control-surface').addEventListener("mousemove", (e) => setPitchAndVolume(e));
+      document.querySelector('#control-surface').addEventListener("touchstart", (e) => { 
+        console.log('Here!');
+        play(); setPitchAndVolume(e); });
+      document.querySelector('#control-surface').addEventListener("touchmove", (e) => { setPitchAndVolume(e); });
+      document.querySelector('#control-surface').addEventListener("touchend", (e) => { stop(); });
+    })();
+  </script>
+</body>
+
+</html>
