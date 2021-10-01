@@ -129,11 +129,9 @@
         }
       }
 
-      // document.querySelector('#control-surface').addEventListener("click", (e) => { toggle(); setPitchAndVolume(e); });
-      // document.querySelector('#control-surface').addEventListener("mousemove", (e) => setPitchAndVolume(e));
-      document.querySelector('#control-surface').addEventListener("touchstart", (e) => { 
-        console.log('Here!');
-        play(); setPitchAndVolume(e); });
+      document.querySelector('#control-surface').addEventListener("click", (e) => { toggle(); setPitchAndVolume(e); });
+      document.querySelector('#control-surface').addEventListener("mousemove", (e) => setPitchAndVolume(e));
+      document.querySelector('#control-surface').addEventListener("touchstart", (e) => { play(); setPitchAndVolume(e); });
       document.querySelector('#control-surface').addEventListener("touchmove", (e) => { setPitchAndVolume(e); });
       document.querySelector('#control-surface').addEventListener("touchend", (e) => { stop(); });
     })();
