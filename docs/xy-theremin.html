@@ -81,9 +81,11 @@
         } while (true)
       }
 
-      // Fill the buffer with white noise;
-      // just random values between -1.0 and 1.0
-      const wave = squareGen(1000)
+      /**
+       * Create fundamental reference wave - set to A440
+       */
+      const wave = squareGen(440);
+
       for (var channel = 0; channel < myArrayBuffer.numberOfChannels; channel++) {
         // This gives us the actual array that contains the data
         var nowBuffering = myArrayBuffer.getChannelData(channel);
@@ -91,6 +93,12 @@
           nowBuffering[i] = wave.next().value;
         }
       }
+
+      /**
+       * Factory which returns an octave scaler - converts a number from 0->1 to
+       * a multipler from 1 to 2^octaveRange
+       */
+      const octaveScaler = (octaveRange, minOctave = 0) => (value) => 2 ** ((value * octaveRange) + minOctave);
 
       let source;
       const play = () => {
@@ -102,19 +110,21 @@
         source.start();
       }
       const stop = () => source.stop();
+      
+      const pitchRange = octaveScaler(3, -3);
 
       const setPitchAndVolume = (e) => {
         e.preventDefault();
         if (!Boolean(source)) return;
-        var offset = e.target.getBoundingClientRect();
+        var shape = e.target.getBoundingClientRect();
         var xPos = e.pageX || e.touches[0].clientX;
         var yPos = e.pageY || e.touches[0].clientX;
         var pos = {
-          x: xPos - offset.left,
-          y: yPos - offset.top,
+          x: xPos - shape.left,
+          y: yPos - shape.top,
         }
-        const freq = 10 ** (1.5 * (pos.x / offset.width) - 1);
-        const gain = 1 - (pos.y / offset.height);
+        const freq = pitchRange(pos.x / shape.width);
+        const gain = 1 - (pos.y / shape.height);
         source.playbackRate.value = freq;
         gainNode.gain.value = gain;
       }
