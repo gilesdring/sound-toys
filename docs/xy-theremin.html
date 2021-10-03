@@ -19,7 +19,7 @@
       background: grey;
     }
 
-    #visualizer {
+    #oscilloscope {
       width: 100%;
       height: 100px;
       padding-top: 10px;
@@ -51,7 +51,7 @@
   </aside>
   <main role="main">
     <div id="control-surface"></div>
-    <canvas id="visualizer"></canvas>
+    <canvas id="oscilloscope"></canvas>
   </main>
   <script>
     (function () {
@@ -154,7 +154,7 @@
 
       const analyser = audioCtx.createAnalyser();
 
-      const canvas = document.getElementById('visualizer');
+      const canvas = document.getElementById('oscilloscope');
       const canvasCtx = canvas.getContext('2d');
       gainNode.connect(analyser);
 
