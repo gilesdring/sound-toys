@@ -29,10 +29,11 @@
     #waveform {
       padding: 10px;
       background: purple;
+      width: 30%;
     }
 
     #oscilloscope {
-      width: 100%;
+      width: 70%;
       height: 100px;
     }
 
@@ -264,13 +265,13 @@
         HEIGHT = canvas.height;
         canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
 
-        const sliceWidth = WIDTH * 110 / myArrayBuffer.length;
+        const sliceWidth = WIDTH * 220 / myArrayBuffer.length;
 
         const data = myArrayBuffer.getChannelData(0);
-        canvasCtx.lineWidth = 2;
-        canvasCtx.strokeStyle = 'rgb(100, 245, 100)';
+        canvasCtx.lineWidth = 5;
+        canvasCtx.strokeStyle = 'rgb(200, 245, 200)';
         canvasCtx.beginPath();
-        console.log(data[1500]);
+
         for (let i = 0; i < myArrayBuffer.length; i++) {
           const y = ((1 - (data[i] * 0.9))) * HEIGHT / 2;
           const x = i * sliceWidth;
@@ -284,7 +285,6 @@
         }
         canvasCtx.stroke();
       };
-
       displayWaveform("waveform");
     })();
   </script>
