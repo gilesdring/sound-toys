@@ -76,11 +76,13 @@
       var myArrayBuffer = audioCtx.createBuffer(2, sampleRate, sampleRate);
       var gainNode = audioCtx.createGain();
       gainNode.connect(audioCtx.destination);
+      let playbackRateAdjustment = 1;
 
       /**
        * Sine wave generator function
        */
       function* sineGen(frequency, sampleRate) {
+        playbackRateAdjustment = 1;
         const r = sampleRate || audioCtx.sampleRate;
         let step = 0;
         const segment = 2 * Math.PI / r * frequency;
@@ -95,6 +97,7 @@
        */
       function* squareGen(frequency, sampleRate) {
         const r = sampleRate || audioCtx.sampleRate;
+        playbackRateAdjustment = 1;
         let step = 0;
         const w = r / frequency;
         do {
@@ -104,9 +107,35 @@
       }
 
       /**
+       * Create wave from a wavetable
+       * It's a small step from here to...
+       */
+      function* waveTableGen(frequency, sampleRate) {
+        const scale = 32;
+        const size = (sampleRate || audioCtx.sampleRate) / scale;
+        playbackRateAdjustment = frequency / scale;
+
+        // Create and fill buffer with wave
+        const buffer = new Float32Array(size);
+        const wtf = (i) => { // Wave Table Function
+          return 0.5 * Math.sin(2 * Math.PI * i / size) + 
+            0.45 * Math.sin(4 * Math.PI * i / size) +
+            0.3 * Math.sin(6 * Math.PI * i / size);
+        }
+        for (let i = 0; i < size; i++) buffer[i] = wtf(i);
+
+        // Loop round the buffer
+        let step = 0;
+        while(true) {
+          yield buffer[step % size];
+          step++;
+        }
+      }
+
+      /**
        * Create fundamental reference wave - set to A440
        */
-      const wave = squareGen(440);
+      const wave = waveTableGen(440);
 
       for (var channel = 0; channel < myArrayBuffer.numberOfChannels; channel++) {
         // This gives us the actual array that contains the data
@@ -147,7 +176,7 @@
         }
         const freq = pitchRange(pos.x / shape.width);
         const gain = 1 - (pos.y / shape.height);
-        source.playbackRate.value = freq;
+        source.playbackRate.value = freq * playbackRateAdjustment;
         gainNode.gain.value = gain;
       }
       let playing;
@@ -265,7 +294,7 @@
         HEIGHT = canvas.height;
         canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
 
-        const sliceWidth = WIDTH * 220 / myArrayBuffer.length;
+        const sliceWidth = WIDTH * 220 / playbackRateAdjustment / myArrayBuffer.length;
 
         const data = myArrayBuffer.getChannelData(0);
         canvasCtx.lineWidth = 5;
