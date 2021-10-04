@@ -82,7 +82,7 @@
       function* sineGen(frequency, sampleRate) {
         const r = sampleRate || audioCtx.sampleRate;
         let step = 0;
-        const segment = Math.PI / r * frequency;
+        const segment = 2 * Math.PI / r * frequency;
         do {
           yield Math.sin(step * segment);
           step++;
