@@ -19,10 +19,21 @@
       background: grey;
     }
 
-    #oscilloscope {
+    #visualisation {
       width: 100%;
       height: 100px;
       padding-top: 10px;
+      display: flex;
+    }
+
+    #waveform {
+      padding: 10px;
+      background: purple;
+    }
+
+    #oscilloscope {
+      width: 100%;
+      height: 100px;
     }
 
     body>* {
@@ -51,7 +62,10 @@
   </aside>
   <main role="main">
     <div id="control-surface"></div>
-    <canvas id="oscilloscope"></canvas>
+    <section id="visualisation">
+      <canvas id="waveform"></canvas>
+      <canvas id="oscilloscope"></canvas>
+    </section>
   </main>
   <script>
     (function () {
@@ -242,6 +256,36 @@
         }
       }
       visualize("waveform");
+
+      const displayWaveform = (id) => {
+        const canvas = document.getElementById(id);
+        const canvasCtx = canvas.getContext('2d');
+        WIDTH = canvas.width;
+        HEIGHT = canvas.height;
+        canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+
+        const sliceWidth = WIDTH * 110 / myArrayBuffer.length;
+
+        const data = myArrayBuffer.getChannelData(0);
+        canvasCtx.lineWidth = 2;
+        canvasCtx.strokeStyle = 'rgb(100, 245, 100)';
+        canvasCtx.beginPath();
+        console.log(data[1500]);
+        for (let i = 0; i < myArrayBuffer.length; i++) {
+          const y = ((1 - (data[i] * 0.9))) * HEIGHT / 2;
+          const x = i * sliceWidth;
+          
+          if (i === 0) {
+            canvasCtx.moveTo(x, y);
+          } else {
+            canvasCtx.lineTo(x, y);
+          }
+          if (x > WIDTH) break;
+        }
+        canvasCtx.stroke();
+      };
+
+      displayWaveform("waveform");
     })();
   </script>
 </body>
