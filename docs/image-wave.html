@@ -10,7 +10,7 @@ refs:
     <canvas id="image"></canvas>
   </section>
   <section>
-    <label for='myFile'>Load image: </label><input type="file" id="myFile"/>
+    <label for='myFile'>Load image: </label><input type="file" id="myFile" />
   </section>
 </main>
 <script>
@@ -22,25 +22,42 @@ refs:
       // FileReader support
       if (FileReader && files && files.length) {
         var fr = new FileReader();
-        fr.onload = () => showImage(fr);
+        fr.onload = () => loadImage(fr);
         fr.readAsDataURL(files[0]);
       }
     }
 
-    function showImage(fileReader) {
-      var img = document.createElement("img");
-      img.onload = () => drawImage(img);
-      img.src = fileReader.result;
-    }
-    
-    function drawImage(img) {
+    function ImageCanvas() {
       const canvas = document.getElementById('image');
       const ctx = canvas.getContext('2d');
       const WIDTH = canvas.width;
-      const HEIGHT = canvas.height;
-      const aspect = (img.naturalHeight / img.naturalWidth) * (canvas.height / canvas.width);
-      ctx.drawImage(img, 0, 0, WIDTH, WIDTH * aspect);
+      const img = document.createElement("img");
+      let aspect;
+
+      function loadImage(fileReader) {
+        img.onload = () => imageLoadedHandler();
+        img.src = fileReader.result;
+      }
+
+      function draw() {
+        ctx.drawImage(img, 0, 0, WIDTH, WIDTH * aspect);
+      }
+
+      function getImageData() {
+        imageData = ctx.getImageData(0, 0, img.width, img.height).data;
+        console.log("image data:", imageData);
+      }
+
+      function imageLoadedHandler() {
+        aspect = (img.naturalHeight / img.naturalWidth) * (canvas.height / canvas.width);
+        draw();
+        getImageData();
+      }
+      
+      return { loadImage };
     }
+
+    const { loadImage } = ImageCanvas();
   })();
 </script>
 <style>
