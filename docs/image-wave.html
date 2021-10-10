@@ -1,0 +1,52 @@
+---
+layout: page
+title: Image Wave
+refs:
+- https://coderwall.com/p/jzdmdq/loading-image-from-local-file-into-javascript-and-getting-pixel-data
+- https://www.freecodecamp.org/news/how-displaying-an-image-on-html5-canvas-works-13e3f6a6c4bd/
+---
+<main>
+  <section>
+    <canvas id="image"></canvas>
+  </section>
+  <section>
+    <label for='myFile'>Load image: </label><input type="file" id="myFile"/>
+  </section>
+</main>
+<script>
+  (() => {
+    document.getElementById('myFile').onchange = function (evt) {
+      var tgt = evt.target || window.event.srcElement,
+        files = tgt.files;
+
+      // FileReader support
+      if (FileReader && files && files.length) {
+        var fr = new FileReader();
+        fr.onload = () => showImage(fr);
+        fr.readAsDataURL(files[0]);
+      }
+    }
+
+    function showImage(fileReader) {
+      var img = document.createElement("img");
+      img.onload = () => drawImage(img);
+      img.src = fileReader.result;
+    }
+    
+    function drawImage(img) {
+      const canvas = document.getElementById('image');
+      const ctx = canvas.getContext('2d');
+      const WIDTH = canvas.width;
+      const HEIGHT = canvas.height;
+      const aspect = (img.naturalHeight / img.naturalWidth) * (canvas.height / canvas.width);
+      ctx.drawImage(img, 0, 0, WIDTH, WIDTH * aspect);
+    }
+  })();
+</script>
+<style>
+  #image {
+    width: 100%;
+    max-width: 500px;
+    height: 500px;
+  }
+</style>
