@@ -6,15 +6,93 @@ refs:
 - https://www.freecodecamp.org/news/how-displaying-an-image-on-html5-canvas-works-13e3f6a6c4bd/
 ---
 <main>
-  <section>
-    <canvas id="image"></canvas>
+  <section id="control">
+    <label for="myFile">Load image: </label><input type="file" id="myFile" />
   </section>
   <section>
-    <label for='myFile'>Load image: </label><input type="file" id="myFile" />
+    <img id="image">
   </section>
 </main>
+
 <script>
   (() => {
+    /**
+     * Convert an RGBA array to a luma value
+     */
+    const rgbaToLuma = (v) => {
+      const [r, g, b, a] = v;
+      const luma = (0.299 * r) + (0.587 * g) + (0.114 * b);
+      return luma;
+    };
+
+    /**
+     * Normalise an array to between -1 and 1
+     */
+    const normalise = (a) => {
+      const min = Math.min(...a);
+      const amp = 2 / (Math.max(...a) - min);
+      return a.map(v => amp * (v - min) - 1);
+    }
+
+    function ImageCanvas() {
+      const samples = 8192;
+      
+      let img;
+      let x;
+      let y;
+      let r;
+      let scale;
+
+      let sampleData;
+
+      function loadImage(fileReader) {
+        img = document.getElementById('image');
+        img.onload = imageLoadedHandler;
+        img.src = fileReader.result;
+      }
+
+      function imageLoadedHandler() {
+        x = img.width / 2;
+        y = img.height / 2;
+        r = img.width / 4;
+        scale = [ img.naturalWidth / img.width, img.naturalHeight / image.height ];
+
+        const getWaveform = prepareBuffer();
+        sampleData = getWaveform(x * scale[0], y * scale[1], r * scale[0], samples);
+        console.dir({ sampleData });
+      }
+
+      /**
+       * Load the image into the buffer for later reading of the waveform
+       */
+      function prepareBuffer() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const getLumaAtCoordinates = ([x, y]) => {
+          const pixel = ctx.getImageData(x, y, 1, 1).data;
+          return rgbaToLuma(pixel);
+        }
+
+        return function sampleWaveform(x, y, r, samples) {
+          const samplePoints = circle(x, y, r, samples);
+          return normalise(samplePoints.map(getLumaAtCoordinates));
+        }
+      }
+
+      function circle(x, y, r, samples = 8192) {
+        const angles = Array.from(new Array(samples)).map((v, i) => 2 * Math.PI * i / samples);
+        return angles.map(a => [x + r * Math.sin(a), y - r * Math.cos(a)]);
+      }
+
+      return { loadImage };
+    }
+
+    const { loadImage } = ImageCanvas();
+
     document.getElementById('myFile').onchange = function (evt) {
       var tgt = evt.target || window.event.srcElement,
         files = tgt.files;
@@ -26,44 +104,11 @@ refs:
         fr.readAsDataURL(files[0]);
       }
     }
-
-    function ImageCanvas() {
-      const canvas = document.getElementById('image');
-      const ctx = canvas.getContext('2d');
-      const WIDTH = canvas.width;
-      const img = document.createElement("img");
-      let aspect;
-
-      function loadImage(fileReader) {
-        img.onload = () => imageLoadedHandler();
-        img.src = fileReader.result;
-      }
-
-      function draw() {
-        ctx.drawImage(img, 0, 0, WIDTH, WIDTH * aspect);
-      }
-
-      function getImageData() {
-        imageData = ctx.getImageData(0, 0, img.width, img.height).data;
-        console.log("image data:", imageData);
-      }
-
-      function imageLoadedHandler() {
-        aspect = (img.naturalHeight / img.naturalWidth) * (canvas.height / canvas.width);
-        draw();
-        getImageData();
-      }
-      
-      return { loadImage };
-    }
-
-    const { loadImage } = ImageCanvas();
   })();
 </script>
+
 <style>
   #image {
-    width: 100%;
-    max-width: 500px;
-    height: 500px;
+    max-width: 100%;
   }
 </style>
