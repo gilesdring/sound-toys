@@ -9,8 +9,12 @@ refs:
   <section id="control">
     <label for="myFile">Load image: </label><input type="file" id="myFile" />
   </section>
-  <section>
+  <section id="selector">
     <img id="image">
+    <canvas id="source"></canvas>
+  </section>
+  <section>
+    <canvas id="waveform"></canvas>
   </section>
 </main>
 
@@ -35,8 +39,8 @@ refs:
     }
 
     function ImageCanvas() {
-      const samples = 8192;
-      
+      const samples = 2048;
+
       let img;
       let x;
       let y;
@@ -52,32 +56,78 @@ refs:
         img.src = fileReader.result;
       }
 
+      const drawWaveform = () => {
+        const canvas = document.getElementById('waveform');
+        canvas.width = samples;
+        canvas.height = samples / 10;
+        if (!sampleData) return;
+
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.lineWidth = Math.round(samples / 500);
+        ctx.strokeStyle = 'rgb(200, 245, 200)';
+        ctx.beginPath();
+        for (let x = 0; x < samples; x++) {
+          const y = (1 - sampleData[x]) * canvas.height / 2;
+          ctx.moveTo(x, canvas.height / 2);
+          ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      const drawSelector = () => {
+        const canvas = document.getElementById('source');
+        canvas.width = img.height;
+        canvas.height = img.width;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const cursorPoints = circle(x, y, r, samples);
+        ctx.lineWidth = canvas.width / 100;
+        ctx.strokeStyle = 'rgb(200, 245, 200)';
+        ctx.beginPath();
+        for (let i = 0; i < cursorPoints.length; i++) {
+          if (i === 0) ctx.moveTo(...cursorPoints[i]);
+          else ctx.lineTo(...cursorPoints[i]);
+        }
+        ctx.closePath();
+        ctx.stroke();
+        return canvas;
+      }
+
       function imageLoadedHandler() {
         x = img.width / 2;
         y = img.height / 2;
-        r = img.width / 4;
-        scale = [ img.naturalWidth / img.width, img.naturalHeight / image.height ];
+        r = img.width / 20;
+        scale = [img.naturalWidth / img.width, img.naturalHeight / image.height];
+        const selector = drawSelector();
 
         const getWaveform = prepareBuffer();
         const readWave = () => {
-          sampleData = getWaveform(Math.floor(x * scale[0]), Math.floor(y * scale[1]), Math.floor(r * scale[0]), samples);
-          console.dir({ sampleData });
+          const scaledX = x * scale[0];
+          const scaledY = y * scale[1];
+          const scaledR = r * scale[0];
+          sampleData = getWaveform(scaledX, scaledY, scaledR, samples);
+          drawWaveform();
         }
         readWave();
         const positionHandler = (e) => {
-          getImageCoordinates(e);
+          ({ x, y } = getImageCoordinates(e));
+          drawSelector();
           readWave();
         }
-        img.onmousemove = positionHandler;
-        img.ontouchmove = positionHandler;
+        selector.onmousemove = positionHandler;
+        selector.ontouchmove = positionHandler;
       }
 
       function getImageCoordinates(e) {
         const shape = e.target.getBoundingClientRect();
-        var xPos = e.clientX || e.touches[0].clientX;
-        var yPos = e.clientY || e.touches[0].clientX;
-        x = Math.floor(xPos - shape.left);
-        y = Math.floor(yPos - shape.top);
+        var xPos = e.pageX || e.touches[0].clientX;
+        var yPos = e.pageY || e.touches[0].clientX;
+        return {
+          x: Math.floor(xPos - shape.left),
+          y: Math.floor(yPos - shape.top)
+        }
       }
 
       /**
@@ -93,13 +143,13 @@ refs:
         delete canvas, ctx;
 
         const getLumaAtCoordinates = ([x, y]) => {
-          const i = Math.floor(x) + Math.floor( y * imageData.width);
-          if (i >= imageData.data.length || i < 0) return;
+          if ( x < 0 || x >= imageData.width || y < 0 || y >= imageData.heeight) return;
+          const i = (x + y * imageData.width) * 4;
           return rgbaToLuma(imageData.data.slice(i, i + 4));
         }
 
         return function sampleWaveform(x, y, r, samples) {
-          const samplePoints = circle(x, y, r, samples);
+          const samplePoints = circle(x, y, r, samples).map(c => c.map(Math.round));
           return normalise(samplePoints.map(getLumaAtCoordinates));
         }
       }
@@ -108,6 +158,8 @@ refs:
         const angles = Array.from(new Array(samples)).map((v, i) => 2 * Math.PI * i / samples);
         return angles.map(a => [x + r * Math.sin(a), y - r * Math.cos(a)]);
       }
+
+      drawWaveform();
 
       return { loadImage };
     }
@@ -130,6 +182,21 @@ refs:
 
 <style>
   #image {
-    max-width: 100%;
+    width: 100%;
+  }
+
+  #selector {
+    position: relative;
+  }
+  #source {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  #waveform {
+    box-sizing: border-box;
+    width: 100%;
   }
 </style>
