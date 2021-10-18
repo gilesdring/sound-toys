@@ -41,7 +41,7 @@ refs:
     function ImageCanvas() {
       const samples = 2048;
 
-      let img;
+      let img = document.getElementById('image');
       let x;
       let y;
       let r;
@@ -51,7 +51,6 @@ refs:
       let sampleData;
 
       function loadImage(fileReader) {
-        img = document.getElementById('image');
         img.onload = imageLoadedHandler;
         img.src = fileReader.result;
       }
@@ -160,6 +159,9 @@ refs:
       }
 
       drawWaveform();
+
+      img.onload = imageLoadedHandler;
+      img.src = '{{ "assets/LIDAR-DTM-1M-SD84.png" | relative_url }}';
 
       return { loadImage };
     }
