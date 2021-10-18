@@ -21,7 +21,7 @@ refs:
      */
     const rgbaToLuma = (v) => {
       const [r, g, b, a] = v;
-      const luma = (0.299 * r) + (0.587 * g) + (0.114 * b);
+      const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
       return luma;
     };
 
@@ -43,6 +43,7 @@ refs:
       let r;
       let scale;
 
+      // let getWaveform; 
       let sampleData;
 
       function loadImage(fileReader) {
@@ -58,8 +59,25 @@ refs:
         scale = [ img.naturalWidth / img.width, img.naturalHeight / image.height ];
 
         const getWaveform = prepareBuffer();
-        sampleData = getWaveform(x * scale[0], y * scale[1], r * scale[0], samples);
-        console.dir({ sampleData });
+        const readWave = () => {
+          sampleData = getWaveform(Math.floor(x * scale[0]), Math.floor(y * scale[1]), Math.floor(r * scale[0]), samples);
+          console.dir({ sampleData });
+        }
+        readWave();
+        const positionHandler = (e) => {
+          getImageCoordinates(e);
+          readWave();
+        }
+        img.onmousemove = positionHandler;
+        img.ontouchmove = positionHandler;
+      }
+
+      function getImageCoordinates(e) {
+        const shape = e.target.getBoundingClientRect();
+        var xPos = e.clientX || e.touches[0].clientX;
+        var yPos = e.clientY || e.touches[0].clientX;
+        x = Math.floor(xPos - shape.left);
+        y = Math.floor(yPos - shape.top);
       }
 
       /**
@@ -71,10 +89,13 @@ refs:
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        delete canvas, ctx;
 
         const getLumaAtCoordinates = ([x, y]) => {
-          const pixel = ctx.getImageData(x, y, 1, 1).data;
-          return rgbaToLuma(pixel);
+          const i = Math.floor(x) + Math.floor( y * imageData.width);
+          if (i >= imageData.data.length || i < 0) return;
+          return rgbaToLuma(imageData.data.slice(i, i + 4));
         }
 
         return function sampleWaveform(x, y, r, samples) {
