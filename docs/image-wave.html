@@ -120,6 +120,7 @@ refs:
       }
 
       function getImageCoordinates(e) {
+        e.preventDefault();
         const shape = e.target.getBoundingClientRect();
         var xPos = e.pageX || e.touches[0].clientX;
         var yPos = e.pageY || e.touches[0].clientX;
