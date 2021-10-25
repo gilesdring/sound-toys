@@ -143,7 +143,7 @@ refs:
         delete canvas, ctx;
 
         const getLumaAtCoordinates = ([x, y]) => {
-          if ( x < 0 || x >= imageData.width || y < 0 || y >= imageData.heeight) return;
+          if ( x < 0 || x >= imageData.width || y < 0 || y >= imageData.height) return;
           const i = (x + y * imageData.width) * 4;
           return rgbaToLuma(imageData.data.slice(i, i + 4));
         }
