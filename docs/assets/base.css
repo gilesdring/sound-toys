@@ -12,6 +12,18 @@ body > * {
   max-width: 720px;
 }
 
+ul {
+  margin: 1em 2em;
+}
+
+body > header {
+  display: flex;
+  align-items: center;
+
+}
+body > header > *:first-child {
+  flex-grow: 2;
+}
 body > header > h1 {
   text-transform: uppercase;
 }
