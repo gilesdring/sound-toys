@@ -121,8 +121,8 @@ refs:
 
       function getImageCoordinates(e) {
         const shape = e.target.getBoundingClientRect();
-        var xPos = e.pageX || e.touches[0].clientX;
-        var yPos = e.pageY || e.touches[0].clientX;
+        var xPos = e.clientX || e.touches[0].clientX;
+        var yPos = e.clientY || e.touches[0].clientX;
         return {
           x: Math.floor(xPos - shape.left),
           y: Math.floor(yPos - shape.top)
