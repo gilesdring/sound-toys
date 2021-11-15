@@ -107,6 +107,8 @@ refs:
           const scaledR = r * scale[0];
           sampleData = getWaveform(scaledX, scaledY, scaledR, samples);
           drawWaveform();
+          const waveChanged = new Event('waveChanged');
+          window.dispatchEvent(waveChanged);
         }
         readWave();
         const positionHandler = (e) => {
@@ -161,15 +163,82 @@ refs:
         return angles.map(a => [x + r * Math.sin(a), y - r * Math.cos(a)]);
       }
 
+      function getWave() {
+        return sampleData;
+      }
+
       drawWaveform();
 
       img.onload = imageLoadedHandler;
       img.src = '{{ "assets/LIDAR-DTM-2M-SD84sw.png" | relative_url }}';
 
-      return { loadImage };
+      return { loadImage, getWave };
     }
 
-    const { loadImage } = ImageCanvas();
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    class WaveSynth {
+      constructor(audioContext) {
+        this.audioContext = audioContext;
+        this.gainNode = this.audioContext.createGain();
+        this.gainNode.connect(this.audioContext.destination);
+        this.playbackRateAdjustment = 1;
+        this.setGain(0.5);
+      }
+
+      setWavetable(wave, frequency = 1000) {
+        const cycles = 10;
+        this.buffer = this.audioContext.createBuffer(2, wave.length * cycles, this.audioContext.sampleRate);
+        this.playbackRateAdjustment = wave.length / this.audioContext.sampleRate;
+
+        function* gen() {
+          let step = 0;
+          const size = wave.length;
+          while (true) {
+            yield wave[step % wave.length];
+            step++;
+          }
+        }
+        for (var channel = 0; channel < this.buffer.numberOfChannels; channel++) {
+          // This gives us the actual array that contains the data
+          var nowBuffering = this.buffer.getChannelData(channel);
+          const waveform = gen();
+          for (var i = 0; i < this.buffer.length; i++) {
+            nowBuffering[i] = waveform.next().value;
+          }
+        }
+      }
+
+      loadWavetable() {
+        this.source = this.audioContext.createBufferSource();
+        this.source.loop = true;
+        this.source.buffer = this.buffer;
+        this.source.connect(this.gainNode);
+      }
+
+      play() {
+        this.stop();
+        this.setGain(0.5);
+        this.loadWavetable();
+        this.setPitch(440);
+        this.source.start();
+        return this;
+      }
+      setPitch(frequency) {
+        this.source.playbackRate.value = frequency * this.playbackRateAdjustment;
+      }
+      setGain(gain) {
+        this.gainNode.gain.setValueAtTime(gain, this.audioContext.currentTime);
+      }
+      stop() {
+        this.setGain(0);
+        if (this.source) this.source.stop();
+      }
+    }
+
+    const { loadImage, getWave } = ImageCanvas();
+
+    const synth = new WaveSynth(audioContext);
 
     document.getElementById('myFile').onchange = function (evt) {
       var tgt = evt.target || window.event.srcElement,
@@ -182,6 +251,13 @@ refs:
         fr.readAsDataURL(files[0]);
       }
     }
+
+    const setWaveform = () => {
+      synth.setWavetable(getWave());
+      synth.play();
+    };
+
+    window.addEventListener('waveChanged', setWaveform);
   })();
 </script>
 
@@ -193,6 +269,7 @@ refs:
   #selector {
     position: relative;
   }
+
   #source {
     position: absolute;
     top: 0;
