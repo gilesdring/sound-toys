@@ -92,12 +92,19 @@ var ImageWave = (function (exports) {
         window.dispatchEvent(waveChanged);
       };
       readWave();
+
+      let delayLoad = false;
+
       const positionHandler = (e) => {
         e.preventDefault();
+        if (delayLoad) return;
         ({ x, y } = getImageCoordinates(e));
         drawSelector();
         readWave();
+        delayLoad = true;
+        setTimeout(() => delayLoad = false, 10);
       };
+
       selector.onmousemove = positionHandler;
       selector.ontouchmove = positionHandler;
     }
