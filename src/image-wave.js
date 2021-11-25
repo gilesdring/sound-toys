@@ -228,7 +228,7 @@ class WaveSynth {
     const oldSource = this.source;
     this.source = createSource(this.buffer);
     
-    const rampTime = 0.15;
+    const rampTime = 0.2;
     this.source.start();
     this.source.fadeIn(rampTime);
     if (oldSource) oldSource.fadeOut(rampTime);
@@ -237,7 +237,6 @@ class WaveSynth {
   play() {
     this.setGain(this.fullGain);
     this.loadWavetable();
-    this.setPitch(440);
     return this;
   }
   setPitch(frequency) {
@@ -262,9 +261,11 @@ export function init({
 
   const setWaveform = () => {
     synth.setWavetable(getWave());
-    synth.play();
+    synth.loadWavetable();
     synth.setPitch(220);
   };
+  
+  synth.play();
 
   window.addEventListener('waveChanged', setWaveform);
   
