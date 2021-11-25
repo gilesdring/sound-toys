@@ -184,6 +184,7 @@ refs:
         this.gainNode.connect(this.audioContext.destination);
         this.playbackRateAdjustment = 1;
         this.setGain(0.5);
+        document.addEventListener('touchend', () => this.audioContext.resume());
       }
 
       setWavetable(wave, frequency = 1000) {
