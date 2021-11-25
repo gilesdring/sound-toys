@@ -96,6 +96,7 @@ function ImageCanvas(initialImage) {
       e.preventDefault();
       if (delayLoad) return;
       ({ x, y } = getImageCoordinates(e));
+      if ( x < r || x >= img.width - r || y < r || y >= img.height - r ) return;
       drawSelector();
       readWave();
       delayLoad = true;
