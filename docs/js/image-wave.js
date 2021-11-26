@@ -9,7 +9,7 @@ var ImageWave = (function (exports) {
       this.limiter = this.audioContext.createDynamicsCompressor();
 
       this.gainNode.connect(this.audioContext.destination);
-      // this.limiter.connect(this.audioContext.destination);
+      this.limiter.connect(this.gainNode);
 
       this.playbackRateAdjustment = 1;
       this.fullGain = 0.1;
@@ -18,7 +18,7 @@ var ImageWave = (function (exports) {
     }
 
     setWavetable(wave) {
-      const cycles = 10;
+      const cycles = 1;
       this.buffer = this.audioContext.createBuffer(2, wave.length * cycles, this.audioContext.sampleRate);
       this.playbackRateAdjustment = wave.length / this.audioContext.sampleRate;
 
@@ -40,7 +40,9 @@ var ImageWave = (function (exports) {
     }
 
     loadWavetable() {
-      const createSource = (buffer) => {
+      const rampTime = 0.5;
+
+      const createSource = (buffer, rampTime) => {
         const wave = this.audioContext.createBufferSource();
         const gainNode = this.audioContext.createGain();
         wave.buffer = buffer;
@@ -50,29 +52,23 @@ var ImageWave = (function (exports) {
         wave.connect(gainNode);
         // Connect gain to destination.
         gainNode.connect(this.gainNode);
-    
+        gainNode.gain.setValueAtTime(0.01, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(1, this.audioContext.currentTime + rampTime);
+        wave.start();
         return {
-          wave: wave,
-          gainNode: gainNode,
-          start: () => wave.start(),
           setPitch: (pitch) => wave.playbackRate.value = pitch,
-          fadeIn: (time) => gainNode.gain.exponentialRampToValueAtTime(1, this.audioContext.currentTime + time),
-          fadeOut: (time) => {
-            gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + time);
+          fadeOut: () => {
+            gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + rampTime);
             setTimeout(() => {
               wave.stop();
               wave.disconnect();
-            }, time * 1000);
+            }, rampTime * 1000);
           },
         };
       };
       const oldSource = this.source;
-      this.source = createSource(this.buffer);
-      
-      const rampTime = 0.2;
-      this.source.start();
-      this.source.fadeIn(rampTime);
-      if (oldSource) oldSource.fadeOut(rampTime);
+      this.source = createSource(this.buffer, rampTime);
+      if (oldSource) oldSource.fadeOut();
     }
 
     play() {
