@@ -10,7 +10,8 @@ var ImageWave = (function (exports) {
     constructor() {
       this.gainNode = audioContext.createGain();
       this.limiter = audioContext.createDynamicsCompressor();
-      this.limiter.attack.value = 0.25;
+      this.limiter.attack.value = 0.01;
+      this.limiter.release.value = 0.01;
       this.gainNode.connect(audioContext.destination);
       this.limiter.connect(this.gainNode);
 
