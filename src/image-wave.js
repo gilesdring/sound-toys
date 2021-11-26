@@ -1,4 +1,5 @@
 import { WaveSynth } from './components/wave-synth';
+import { resume, pause } from './components/audio-subsystem';
 
 /**
  * Convert an RGBA array to a luma value
@@ -166,6 +167,7 @@ function ImageCanvas(initialImage) {
 export function init({
   initialImage,
 }) {
+  pause();
   const { loadImage, getWave } = ImageCanvas(initialImage);
 
   const synth = new WaveSynth();
@@ -192,3 +194,4 @@ export function init({
     }
   }  
 }
+export { resume, pause };

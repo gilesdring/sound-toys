@@ -1,16 +1,16 @@
 import { audioContext } from './audio-subsystem';
+
 export class WaveSynth {
   constructor() {
     this.gainNode = audioContext.createGain();
     this.limiter = audioContext.createDynamicsCompressor();
-
+    this.limiter.attack.value = 0.25;
     this.gainNode.connect(audioContext.destination);
     this.limiter.connect(this.gainNode);
 
     this.playbackRateAdjustment = 1;
     this.fullGain = 0.1;
     this.setGain(this.fullGain);
-    document.addEventListener('touchend', () => audioContext.resume());
   }
 
   setWavetable(wave) {

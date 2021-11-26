@@ -3,18 +3,20 @@ var ImageWave = (function (exports) {
 
   const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
+  const pause = () => audioContext.suspend();
+  const resume = () => audioContext.resume();
+
   class WaveSynth {
     constructor() {
       this.gainNode = audioContext.createGain();
       this.limiter = audioContext.createDynamicsCompressor();
-
+      this.limiter.attack.value = 0.25;
       this.gainNode.connect(audioContext.destination);
       this.limiter.connect(this.gainNode);
 
       this.playbackRateAdjustment = 1;
       this.fullGain = 0.1;
       this.setGain(this.fullGain);
-      document.addEventListener('touchend', () => audioContext.resume());
     }
 
     setWavetable(wave) {
@@ -253,6 +255,7 @@ var ImageWave = (function (exports) {
   function init({
     initialImage,
   }) {
+    pause();
     const { loadImage, getWave } = ImageCanvas(initialImage);
 
     const synth = new WaveSynth();
@@ -281,6 +284,8 @@ var ImageWave = (function (exports) {
   }
 
   exports.init = init;
+  exports.pause = pause;
+  exports.resume = resume;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

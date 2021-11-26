@@ -7,7 +7,13 @@ refs:
 ---
 <main role="main">
   <section id="control">
-    <label for="myFile">Load image: </label><input type="file" id="myFile" />
+    <p>
+      <label for="myFile">Load image: </label><input type="file" id="myFile" />
+    </p>
+    <p>
+      <button onclick="ImageWave.resume()">Start noise</button>
+      <button onclick="ImageWave.pause()">Stop noise</button>
+    </p>
   </section>
   <section id="selector">
     <img id="image">
@@ -44,5 +50,11 @@ refs:
   #waveform {
     box-sizing: border-box;
     width: 100%;
+  }
+  #control p {
+    margin-bottom: 0.3em;
+  }
+  button {
+    padding: 0.2em 1em;
   }
 </style>
