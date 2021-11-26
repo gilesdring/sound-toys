@@ -93,17 +93,12 @@ function ImageCanvas(initialImage) {
     }
     readWave();
 
-    let delayLoad = false;
-
     const positionHandler = (e) => {
       e.preventDefault();
-      if (delayLoad) return;
       ({ x, y } = getImageCoordinates(e));
       if ( x < r || x >= img.width - r || y < r || y >= img.height - r ) return;
       drawSelector();
       readWave();
-      delayLoad = true;
-      setTimeout(() => delayLoad = false, 10);
     }
 
     selector.onmousemove = positionHandler;
