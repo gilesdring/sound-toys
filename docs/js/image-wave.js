@@ -1,26 +1,26 @@
 var ImageWave = (function (exports) {
   'use strict';
 
+  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
   class WaveSynth {
-    constructor(audioContext) {
-      this.audioContext = audioContext;
+    constructor() {
+      this.gainNode = audioContext.createGain();
+      this.limiter = audioContext.createDynamicsCompressor();
 
-      this.gainNode = this.audioContext.createGain();
-      this.limiter = this.audioContext.createDynamicsCompressor();
-
-      this.gainNode.connect(this.audioContext.destination);
+      this.gainNode.connect(audioContext.destination);
       this.limiter.connect(this.gainNode);
 
       this.playbackRateAdjustment = 1;
       this.fullGain = 0.1;
       this.setGain(this.fullGain);
-      document.addEventListener('touchend', () => this.audioContext.resume());
+      document.addEventListener('touchend', () => audioContext.resume());
     }
 
     setWavetable(wave) {
       const cycles = 1;
-      this.buffer = this.audioContext.createBuffer(2, wave.length * cycles, this.audioContext.sampleRate);
-      this.playbackRateAdjustment = wave.length / this.audioContext.sampleRate;
+      this.buffer = audioContext.createBuffer(2, wave.length * cycles, audioContext.sampleRate);
+      this.playbackRateAdjustment = wave.length / audioContext.sampleRate;
 
       function* gen() {
         let step = 0;
@@ -43,8 +43,8 @@ var ImageWave = (function (exports) {
       const rampTime = 0.5;
 
       const createSource = (buffer, rampTime) => {
-        const wave = this.audioContext.createBufferSource();
-        const gainNode = this.audioContext.createGain();
+        const wave = audioContext.createBufferSource();
+        const gainNode = audioContext.createGain();
         wave.buffer = buffer;
         // Turn on looping
         wave.loop = true;
@@ -52,13 +52,13 @@ var ImageWave = (function (exports) {
         wave.connect(gainNode);
         // Connect gain to destination.
         gainNode.connect(this.gainNode);
-        gainNode.gain.setValueAtTime(0.01, this.audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(1, this.audioContext.currentTime + rampTime);
+        gainNode.gain.setValueAtTime(0.01, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(1, audioContext.currentTime + rampTime);
         wave.start();
         return {
           setPitch: (pitch) => wave.playbackRate.value = pitch,
           fadeOut: () => {
-            gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + rampTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + rampTime);
             setTimeout(() => {
               wave.stop();
               wave.disconnect();
@@ -80,7 +80,7 @@ var ImageWave = (function (exports) {
       this.source.setPitch(frequency * this.playbackRateAdjustment);
     }
     setGain(gain) {
-      this.gainNode.gain.setValueAtTime(gain, this.audioContext.currentTime);
+      this.gainNode.gain.setValueAtTime(gain, audioContext.currentTime);
     }
     stop() {
       this.setGain(0);
@@ -253,11 +253,9 @@ var ImageWave = (function (exports) {
   function init({
     initialImage,
   }) {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
     const { loadImage, getWave } = ImageCanvas(initialImage);
 
-    const synth = new WaveSynth(audioContext);
+    const synth = new WaveSynth();
 
     const setWaveform = () => {
       synth.setWavetable(getWave());
