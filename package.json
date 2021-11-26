@@ -8,6 +8,9 @@
     "doc": "docs"
   },
   "scripts": {
+    "build": "rollup --config rollup.config.js",
+    "serve": "bundle exec jekyll serve --source docs",
+    "dev": "concurrently --prefix-colors blue,green \"npm:serve -- --livereload --open-url\" \"npm:build -- --watch\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -26,6 +29,7 @@
   },
   "homepage": "https://github.com/gilesdring/sound-toys#readme",
   "devDependencies": {
+    "concurrently": "^6.4.0",
     "rollup": "^2.60.1"
   }
 }
