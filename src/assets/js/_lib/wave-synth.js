@@ -1,4 +1,4 @@
-import { audioContext } from './audio-subsystem';
+import { audioContext } from './audio-subsystem.js';
 
 export class WaveSynth {
   constructor() {
@@ -26,11 +26,11 @@ export class WaveSynth {
         step++;
       }
     }
-    for (var channel = 0; channel < this.buffer.numberOfChannels; channel++) {
+    for (let channel = 0; channel < this.buffer.numberOfChannels; channel++) {
       // This gives us the actual array that contains the data
-      var nowBuffering = this.buffer.getChannelData(channel);
+      const nowBuffering = this.buffer.getChannelData(channel);
       const waveform = gen();
-      for (var i = 0; i < this.buffer.length; i++) {
+      for (let i = 0; i < this.buffer.length; i++) {
         nowBuffering[i] = waveform.next().value;
       }
     }

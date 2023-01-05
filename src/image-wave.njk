@@ -1,5 +1,5 @@
 ---
-layout: base
+layout: layouts/base.njk
 title: Image Wave
 refs:
 - https://coderwall.com/p/jzdmdq/loading-image-from-local-file-into-javascript-and-getting-pixel-data
@@ -11,8 +11,8 @@ refs:
       <label for="myFile">Load image: </label><input type="file" id="myFile" />
     </p>
     <p>
-      <button onclick="ImageWave.resume()">Start noise</button>
-      <button onclick="ImageWave.pause()">Stop noise</button>
+      <button onclick="app.ImageWave.resume()">Start noise</button>
+      <button onclick="app.ImageWave.pause()">Stop noise</button>
     </p>
   </section>
   <section id="selector">
@@ -24,10 +24,10 @@ refs:
   </section>
 </main>
 
-<script src="{{ 'js/image-wave.js' | relative_url }}"/"></script>
+<script src="/assets/js/image-wave.js"></script>
 <script>
-  ImageWave.init({
-    initialImage: '{{ "assets/LIDAR-DTM-2M-SD84sw.png" | relative_url }}'
+  app.ImageWave.init({
+    initialImage: "/assets/images/LIDAR-DTM-2M-SD84sw.png",
   });
 </script>
 

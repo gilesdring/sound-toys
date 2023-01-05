@@ -1,11 +1,11 @@
-import { WaveSynth } from './components/wave-synth';
-import { resume, pause } from './components/audio-subsystem';
+import { WaveSynth } from './wave-synth.js';
+import { resume, pause } from './audio-subsystem.js';
 
 /**
  * Convert an RGBA array to a luma value
  */
 const rgbaToLuma = (v) => {
-  const [r, g, b, a] = v;
+  const [r, g, b, _a] = v;
   const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
   return luma;
 };
@@ -22,7 +22,7 @@ const normalise = (a) => {
 function ImageCanvas(initialImage) {
   const samples = 2048;
 
-  let img = document.getElementById('image');
+  const img = document.getElementById('image');
   let x;
   let y;
   let r;
@@ -89,7 +89,7 @@ function ImageCanvas(initialImage) {
       sampleData = getWaveform(scaledX, scaledY, scaledR, samples);
       drawWaveform();
       const waveChanged = new Event('waveChanged');
-      window.dispatchEvent(waveChanged);
+      dispatchEvent(waveChanged);
     }
     readWave();
 
@@ -107,8 +107,8 @@ function ImageCanvas(initialImage) {
 
   function getImageCoordinates(e) {
     const shape = e.target.getBoundingClientRect();
-    var xPos = e.clientX || e.touches[0].clientX;
-    var yPos = e.clientY || e.touches[0].clientY;
+    const xPos = e.clientX || e.touches[0].clientX;
+    const yPos = e.clientY || e.touches[0].clientY;
     return {
       x: Math.floor(xPos - shape.left),
       y: Math.floor(yPos - shape.top)
@@ -143,7 +143,7 @@ function ImageCanvas(initialImage) {
   }
 
   function circle(x, y, r, samples = 8192) {
-    const angles = Array.from(new Array(samples)).map((v, i) => 2 * Math.PI * i / samples);
+    const angles = Array.from(new Array(samples)).map((_v, i) => 2 * Math.PI * i / samples);
     return angles.map(a => [x + r * Math.sin(a), y - r * Math.cos(a)]);
   }
 
@@ -159,7 +159,7 @@ function ImageCanvas(initialImage) {
   return { loadImage, getWave };
 }
 
-export function init({
+function init({
   initialImage,
 }) {
   pause();
@@ -175,18 +175,19 @@ export function init({
   
   synth.play();
 
-  window.addEventListener('waveChanged', setWaveform);
+  addEventListener('waveChanged', setWaveform);
   
   document.getElementById('myFile').onchange = function (evt) {
-    var tgt = evt.target || window.event.srcElement,
+    const tgt = evt.target || window.event.srcElement,
       files = tgt.files;
   
     // FileReader support
     if (FileReader && files && files.length) {
-      var fr = new FileReader();
+      const fr = new FileReader();
       fr.onload = () => loadImage(fr);
       fr.readAsDataURL(files[0]);
     }
   }  
 }
-export { resume, pause };
+
+export const ImageWave = { init, resume, pause };

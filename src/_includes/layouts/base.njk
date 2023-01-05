@@ -7,18 +7,18 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SOUNDTOYS :: {{ page.title | upcase }}</title>
-  <link rel="stylesheet" href="{{ 'assets/base.css' | relative_url }}">
+  <title>SOUNDTOYS :: {{ page.title }}</title>
+  <link rel="stylesheet" href="/assets/base.css">
 </head>
 
 <body>
   <header>
     <h1>{{ page.title }}</h1>
     <nav>
-      {% if page.url != '/' %}<a href="{{ '/' | relative_url }}">Sound Toys Home</a>{% endif %}
+      {% if page.url != '/' %}<a href="/">Sound Toys Home</a>{% endif %}
     </nav>
   </header>
-  {{ content }}
+  {{ content | safe }}
 </body>
 
 </html>
