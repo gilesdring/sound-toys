@@ -1,5 +1,6 @@
 import { WaveSynth } from './wave-synth.js';
 import { resume, pause } from './audio-subsystem.js';
+import { displayWaveform } from './visualisers/waveform.ts';
 
 /**
  * Convert an RGBA array to a luma value
@@ -37,22 +38,16 @@ function ImageCanvas(initialImage) {
   }
 
   const drawWaveform = () => {
-    const canvas = document.getElementById('waveform');
+    if (!sampleData) return;
+    const canvas = document.getElementById("waveform");
     canvas.width = samples;
     canvas.height = samples / 10;
-    if (!sampleData) return;
-
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.lineWidth = Math.round(samples / 500);
-    ctx.strokeStyle = 'rgb(200, 245, 200)';
-    ctx.beginPath();
-    for (let x = 0; x < samples; x++) {
-      const y = (1 - sampleData[x]) * canvas.height / 2;
-      ctx.moveTo(x, canvas.height / 2);
-      ctx.lineTo(x, y);
-    }
-    ctx.stroke();
+    displayWaveform({
+      id: "waveform",
+      data: sampleData,
+      cycles: 3,
+      lineWidth: 4,
+    })
   }
 
   const drawSelector = () => {
