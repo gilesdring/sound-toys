@@ -1,6 +1,6 @@
 import { WaveSynth } from './wave-synth.js';
 import { resume, pause } from './audio-subsystem.js';
-import { displayWaveform } from './visualisers/waveform.ts';
+import { DisplayWaveform } from './visualisers/waveform.ts';
 import { rgbaToLuma } from "./util/colour.ts";
 import { normalise } from "./util/array.ts";
 
@@ -8,6 +8,10 @@ function ImageCanvas({
   initialImage
 }) {
   const samples = 2048;
+
+  const canvas = document.getElementById("waveform");
+  canvas.width = samples;
+  canvas.height = samples / 10;
 
   const img = document.getElementById('image');
   let x;
@@ -21,19 +25,6 @@ function ImageCanvas({
   function loadImage(fileReader) {
     img.onload = imageLoadedHandler;
     img.src = fileReader.result;
-  }
-
-  const drawWaveform = () => {
-    if (!sampleData) return;
-    const canvas = document.getElementById("waveform");
-    canvas.width = samples;
-    canvas.height = samples / 10;
-    displayWaveform({
-      id: "waveform",
-      data: sampleData,
-      cycles: 3,
-      lineWidth: 4,
-    })
   }
 
   const drawSelector = () => {
@@ -68,7 +59,6 @@ function ImageCanvas({
       const scaledY = y * scale[1];
       const scaledR = r * scale[0];
       sampleData = getWaveform(scaledX, scaledY, scaledR, samples);
-      drawWaveform();
       const waveChanged = new Event('waveChanged');
       dispatchEvent(waveChanged);
     }
@@ -77,7 +67,7 @@ function ImageCanvas({
     const positionHandler = (e) => {
       e.preventDefault();
       ({ x, y } = getImageCoordinates(e));
-      if ( x < r || x >= img.width - r || y < r || y >= img.height - r ) return;
+      if (x < r || x >= img.width - r || y < r || y >= img.height - r) return;
       drawSelector();
       readWave();
     }
@@ -132,8 +122,6 @@ function ImageCanvas({
     return sampleData;
   }
 
-  drawWaveform();
-
   img.onload = imageLoadedHandler;
   img.src = initialImage;
 
@@ -150,27 +138,37 @@ function init({
 
   const synth = new WaveSynth();
 
-  const setWaveform = () => {
-    synth.setWavetable(getWave());
-    synth.loadWavetable();
-    synth.setPitch(220);
-  };
-  
+  const waveformDisplay = new DisplayWaveform({
+    id: "waveform",
+    data: synth.getBuffer(),
+    cycles: 3,
+    lineWidth: 4,
+  });
+
   synth.play();
 
-  addEventListener('waveChanged', setWaveform);
-  
+  addEventListener('waveChanged', () => {
+    synth.setWavetable(getWave());
+    synth.setPitch(220);
+  });
+
+
+  addEventListener('bufferUpdated', (e) => {
+    console.log(e);
+    waveformDisplay.updateBuffer(synth.getBuffer());
+  });
+
   document.getElementById('myFile').onchange = function (evt) {
     const tgt = evt.target || window.event.srcElement,
       files = tgt.files;
-  
+
     // FileReader support
     if (FileReader && files && files.length) {
       const fr = new FileReader();
       fr.onload = () => loadImage(fr);
       fr.readAsDataURL(files[0]);
     }
-  }  
+  }
 }
 
 export const ImageWave = { init, resume, pause };

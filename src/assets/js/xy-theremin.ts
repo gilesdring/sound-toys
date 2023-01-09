@@ -1,5 +1,5 @@
 import { audioContext as audioCtx } from './_lib/audio-subsystem.js';
-import { displayWaveform } from './_lib/visualisers/waveform.ts';
+import { DisplayWaveform } from './_lib/visualisers/waveform.ts';
 import { visualize } from './_lib/visualisers/signal.ts';
 
 const sampleRate = audioCtx.sampleRate;
@@ -112,7 +112,7 @@ visualize({
   displayType: "waveform"
 });
 
-displayWaveform({
-  data: arrayBuffer.getChannelData(0),
+new DisplayWaveform({
+  buffer: arrayBuffer,
   id: "waveform",
 });

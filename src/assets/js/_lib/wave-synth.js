@@ -34,6 +34,12 @@ export class WaveSynth {
         nowBuffering[i] = waveform.next().value;
       }
     }
+    dispatchEvent(new Event('bufferUpdated'));
+    this.loadWavetable();
+  }
+
+  getBuffer() {
+    return this.buffer;
   }
 
   loadWavetable() {
