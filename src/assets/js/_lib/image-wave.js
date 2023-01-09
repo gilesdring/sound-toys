@@ -1,26 +1,12 @@
 import { WaveSynth } from './wave-synth.js';
 import { resume, pause } from './audio-subsystem.js';
 import { displayWaveform } from './visualisers/waveform.ts';
+import { rgbaToLuma } from "./util/colour.ts";
+import { normalise } from "./util/array.ts";
 
-/**
- * Convert an RGBA array to a luma value
- */
-const rgbaToLuma = (v) => {
-  const [r, g, b, _a] = v;
-  const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  return luma;
-};
-
-/**
- * Normalise an array to between -1 and 1
- */
-const normalise = (a) => {
-  const min = Math.min(...a);
-  const amp = 2 / (Math.max(...a) - min);
-  return a.map(v => amp * (v - min) - 1);
-}
-
-function ImageCanvas(initialImage) {
+function ImageCanvas({
+  initialImage
+}) {
   const samples = 2048;
 
   const img = document.getElementById('image');
@@ -158,7 +144,9 @@ function init({
   initialImage,
 }) {
   pause();
-  const { loadImage, getWave } = ImageCanvas(initialImage);
+  const { loadImage, getWave } = ImageCanvas({
+    initialImage
+  });
 
   const synth = new WaveSynth();
 
