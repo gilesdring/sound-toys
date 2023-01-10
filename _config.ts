@@ -12,6 +12,7 @@ site
     options: {
       format: 'iife',
       globalName: 'app',
+      minify: true,
     },
   }))
   .use(base_path())
