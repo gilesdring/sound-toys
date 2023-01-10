@@ -4,8 +4,8 @@ export class WaveSynth {
   constructor() {
     this.gainNode = audioContext.createGain();
     this.limiter = audioContext.createDynamicsCompressor();
-    this.limiter.attack.value = 0.01;
-    this.limiter.release.value = 0.01;
+    this.limiter.attack.value = 0.05;
+    this.limiter.release.value = 0.1;
     this.gainNode.connect(audioContext.destination);
     this.limiter.connect(this.gainNode);
 
@@ -43,7 +43,7 @@ export class WaveSynth {
   }
 
   loadWavetable() {
-    const rampTime = 0.5;
+    const rampTime = 0.1;
 
     const createSource = (buffer, rampTime) => {
       const wave = audioContext.createBufferSource();
@@ -55,13 +55,13 @@ export class WaveSynth {
       wave.connect(gainNode);
       // Connect gain to destination.
       gainNode.connect(this.gainNode);
-      gainNode.gain.setValueAtTime(0.01, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(1, audioContext.currentTime + rampTime)
+      gainNode.gain.setValueAtTime(0.001, audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + rampTime)
       wave.start();
       return {
         setPitch: (pitch) => wave.playbackRate.value = pitch,
         fadeOut: () => {
-          gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + rampTime);
+          gainNode.gain.linearRampToValueAtTime(0.00, audioContext.currentTime + rampTime);
           setTimeout(() => {
             wave.stop();
             wave.disconnect();

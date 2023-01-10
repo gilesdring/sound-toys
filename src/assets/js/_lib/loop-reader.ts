@@ -12,6 +12,12 @@ export function getImageCoordinates(e) {
   }
 }
 
+interface LoopReaderOptions {
+  canvasId: string;
+  imgId: string;
+  samples: number;
+}
+
 export class LoopReader {
   samples: number;
   canvas: HTMLCanvasElement;
@@ -24,11 +30,13 @@ export class LoopReader {
   x!: number;
   y!: number;
   scale!: [number, number];
+  sampling: boolean;
 
-  constructor({ canvasId, imgId, samples = 2048 }) {
+  constructor({ canvasId, imgId, samples = 2048 }: LoopReaderOptions) {
     this.samples = samples;
-    this.canvas = document.getElementById(canvasId);
-    this.img = document.getElementById(imgId);
+    this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
+    this.img = document.getElementById(imgId) as HTMLImageElement;
+    this.sampling = false;
 
     // Update buffer when image changes
     this.img.addEventListener('load', () => {
@@ -63,22 +71,24 @@ export class LoopReader {
   }
 
   sampleWaveform() {
+    if (this.sampling) return
+    this.sampling = true;
     const scaledX = this.x * this.scale[0];
     const scaledY = this.y * this.scale[1];
     const scaledR = this.r * this.scale[0];
-
     const samplePoints = circle(scaledX, scaledY, scaledR, this.samples).map(c => c.map(Math.round));
-
-    const getLumaAtCoordinates = ([x, y]) => {
+    
+    const getLumaAtCoordinates = ([x, y]: [number, number]) => {
       if (x < 0 || x >= this.imageData.width || y < 0 || y >= this.imageData.height)
-        return;
+      return;
       const i = (x + y * this.imageData.width) * 4;
       return rgbaToLuma(this.imageData.data.slice(i, i + 4));
     };
-
+    
     this.sampleData = normalise(samplePoints.map(getLumaAtCoordinates));
     const waveChanged = new Event('waveChanged');
     dispatchEvent(waveChanged);
+    this.sampling = false;
   }
 
   setRadius(r: number) {
