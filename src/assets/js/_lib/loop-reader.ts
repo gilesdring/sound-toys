@@ -2,7 +2,8 @@ import { rgbaToLuma } from "./util/colour.ts";
 import { normalise } from "./util/array.ts";
 import { circle } from './util/shape.ts';
 
-export function getImageCoordinates(e) {
+export function getImageCoordinates(e: Event) {
+  if (!e.target) return;
   const shape = e.target.getBoundingClientRect();
   const xPos = e.clientX || e.touches[0].clientX;
   const yPos = e.clientY || e.touches[0].clientY;
@@ -32,11 +33,14 @@ export class LoopReader {
   scale!: [number, number];
   sampling: boolean;
 
+  locked: boolean;
+
   constructor({ canvasId, imgId, samples = 2048 }: LoopReaderOptions) {
     this.samples = samples;
     this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
     this.img = document.getElementById(imgId) as HTMLImageElement;
     this.sampling = false;
+    this.locked = true;
 
     // Update buffer when image changes
     this.img.addEventListener('load', () => {
@@ -44,7 +48,10 @@ export class LoopReader {
       this.setRadius(this.img.width / 20);
       this.setPosition({ x: this.img.width / 2, y: this.img.height / 2 });
     });
+    this.registerHandlers();
+  }
 
+  registerHandlers() {
     const positionHandler = (e) => {
       if (!this.r)
         return;
@@ -54,8 +61,18 @@ export class LoopReader {
         return;
       this.setPosition({ x, y });
     };
+    this.canvas.addEventListener('mousedown', (e) => {
+      this.unlock()
+      positionHandler(e);
+    });
     this.canvas.addEventListener('mousemove', positionHandler);
+    this.canvas.addEventListener('mouseup', (e) => {
+      this.lock()
+      positionHandler(e);
+    });
+    this.canvas.addEventListener('touchstart', () => this.unlock());
     this.canvas.addEventListener('touchmove', positionHandler);
+    this.canvas.addEventListener('touchend', () => this.lock());
   }
 
   setBuffer() {
@@ -70,7 +87,7 @@ export class LoopReader {
     this.imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   }
 
-  sampleWaveform() {
+  private sampleWaveform() {
     if (this.sampling) return
     this.sampling = true;
     const scaledX = this.x * this.scale[0];
@@ -96,10 +113,19 @@ export class LoopReader {
   }
 
   setPosition({ x, y }) {
+    if (this.locked && this.x && this.y) return;
     this.x = x;
     this.y = y;
     this.sampleWaveform();
     this.draw();
+  }
+
+  lock() {
+    this.locked = true;
+  }
+
+  unlock() {
+    this.locked = false;
   }
 
   draw() {
