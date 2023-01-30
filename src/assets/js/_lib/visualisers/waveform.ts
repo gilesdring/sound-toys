@@ -1,5 +1,5 @@
 interface DisplayWaveformOptions {
-  buffer: AudioBuffer;
+  buffer?: AudioBuffer;
   id: string;
   cycles?: number;
   lineWidth?: number;
@@ -27,10 +27,10 @@ export class DisplayWaveform {
     this.canvasCtx = canvasCtx;
     this.cycles = cycles;
     this.lineWidth = lineWidth;
-    this.updateBuffer(buffer);
+    if (buffer) this.updateBuffer(buffer);
   }
 
-  private updateBuffer(buffer: AudioBuffer) {
+  updateBuffer(buffer: AudioBuffer) {
     if (!buffer) return;
     this.buffer = buffer;
     this.draw();

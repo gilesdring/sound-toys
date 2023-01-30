@@ -1,0 +1,52 @@
+---
+layout: layouts/base.njk
+title: Lidar Theremin
+---
+<style>
+  main * + * {
+    margin-top: 1em;
+  }
+  .no-top-margin * + * {
+    margin-top: 0;
+  }
+
+  #image {
+    position: relative;
+  }
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+</style>
+
+<main role="main">
+  <div id="control">
+    <button id="play-wave">Play theremin</button>
+    <button id="set-wave">Select wave terrain orbit</button>
+  </div>
+  <div id="image"class="pane no-top-margin">
+  </div>
+  <div id="visualisation" class="no-top-margin">
+    <canvas id="waveform"></canvas>
+    <canvas id="oscilloscope"></canvas>
+  </div>
+</main>
+
+<script src="/assets/js/lidar-theremin.js"></script>
+<script>
+  addEventListener('DOMContentLoaded', () => {
+    const app = new soundToys.LidarTheremin({
+      image: '{{ "/assets/images/LIDAR-DTM-2M-SD84sw.png" | url }}',
+      imageId: 'image',
+    });
+
+    document.querySelector('#set-wave').addEventListener('click', () => app.setSamplingMode());
+    document.querySelector('#play-wave').addEventListener('click', () => app.setPlayMode());
+
+    soundToys.setupVisualisers({
+      wave: 'waveform',
+      buffer: app.synth.getBuffer(),
+    });
+  })
+</script>

@@ -24,8 +24,8 @@ function init({
   const synth = new WaveSynth();
 
   const waveformDisplay = new DisplayWaveform({
+    buffer: synth.getBuffer(),
     id: "waveform",
-    data: synth.getBuffer(),
     cycles: 3,
     lineWidth: 4,
   });
