@@ -1,17 +1,7 @@
 import { rgbaToLuma } from "./util/colour.ts";
 import { normalise } from "./util/array.ts";
 import { circle } from './util/shape.ts';
-
-export function getImageCoordinates(e: Event) {
-  if (!e.target) return;
-  const shape = e.target.getBoundingClientRect();
-  const xPos = e.clientX || e.touches[0].clientX;
-  const yPos = e.clientY || e.touches[0].clientY;
-  return {
-    x: Math.floor(xPos - shape.left),
-    y: Math.floor(yPos - shape.top)
-  }
-}
+import { getImageCoordinates } from "./image-readers/helpers.ts";
 
 interface LoopReaderOptions {
   canvasId: string;
