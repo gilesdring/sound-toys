@@ -12,7 +12,7 @@ site
   .use(esbuild({
     options: {
       format: 'iife',
-      globalName: 'app',
+      globalName: 'soundToys',
       minify: true,
     },
   }))
