@@ -12,6 +12,7 @@ export function visualize({
   const HEIGHT = canvas.height;
 
   if (displayType === "waveform") {
+    canvas.classList.remove('spectrum');
     analyser.fftSize = 4096;
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
@@ -19,8 +20,7 @@ export function visualize({
     const draw = function () {
       requestAnimationFrame(draw);
       analyser.getByteTimeDomainData(dataArray);
-      canvasCtx.fillStyle = 'rgb(0, 100, 0)';
-      canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+      canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
       canvasCtx.lineWidth = 2;
       canvasCtx.strokeStyle = 'rgb(0, 255, 0)';
       canvasCtx.beginPath();
@@ -50,6 +50,7 @@ export function visualize({
 
   }
   else if (displayType == "frequencybars") {
+    canvas.classList.add('spectrum');
     analyser.fftSize = 256;
     const bufferLengthAlt = analyser.frequencyBinCount;
     console.log(bufferLengthAlt);
@@ -62,8 +63,7 @@ export function visualize({
 
       analyser.getByteFrequencyData(dataArrayAlt);
 
-      canvasCtx.fillStyle = 'rgb(0, 0, 0)';
-      canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+      canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
 
       const barWidth = (WIDTH / bufferLengthAlt) * 2.5;
       let x = 0;
