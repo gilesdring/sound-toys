@@ -45,12 +45,12 @@ export class TerrainSampler {
     const scaledY = y * this.size[1];
     const scaledR = r * this.size[0];
 
-    const samplePoints = circle(scaledX, scaledY, scaledR, this.samples).map(c => c.map(Math.round));
+    const samplePoints = circle(scaledX, scaledY, scaledR, this.samples).map(c => c.map(Math.round) as [number, number]);
 
     const getLumaAtCoordinates = ([x, y]: [number, number]) => {
-      if (x < 0 || x >= this.imageData.width || y < 0 || y >= this.imageData.height) return;
+      if (x < 0 || x >= this.imageData.width || y < 0 || y >= this.imageData.height) throw new Error('Coordinate out of bounds');
       const i = (x + y * this.imageData.width) * 4;
-      return rgbaToLuma(this.imageData.data.slice(i, i + 4) as [number, number, number, number]);
+      return rgbaToLuma(Array.from(this.imageData.data.slice(i, i + 4)) as [number, number, number, number]);
     };
     this.sampleData = normalise(samplePoints.map(getLumaAtCoordinates));
     dispatchEvent(new CustomEvent('waveChanged', {

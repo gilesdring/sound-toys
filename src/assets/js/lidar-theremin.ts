@@ -40,7 +40,6 @@ export class LidarTheremin {
     });
 
     this.sampler = new TerrainSampler({
-      cursor: this.cursor,
       image: this.imageEl,
     });
 
@@ -98,6 +97,6 @@ export function setupVisualisers(config: {
   });
 
   addEventListener('bufferUpdated', (e) => {
-    waveformDisplay.updateBuffer(e.detail.buffer);
+    waveformDisplay.updateBuffer((<CustomEvent>e).detail.buffer);
   });
 }
