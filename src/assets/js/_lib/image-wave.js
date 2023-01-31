@@ -1,19 +1,19 @@
-import { WaveSynth } from './wave-synth.js';
-import { resume, pause } from './audio-subsystem.js';
-import { DisplayWaveform } from './visualisers/waveform.ts';
+import { WaveSynth } from "./wave-synth.js";
+import { pause, resume } from "./audio-subsystem.js";
+import { DisplayWaveform } from "./visualisers/waveform.ts";
 import { LoopReader } from "./loop-reader.ts";
 
 function init({
   initialImage,
 }) {
   const loopReader = new LoopReader({
-    canvasId: 'source',
-    imgId: 'image',
+    canvasId: "source",
+    imgId: "image",
     samples: 2048,
   });
-  
+
   pause();
-  const image = document.getElementById('image');
+  const image = document.getElementById("image");
   image.src = initialImage;
 
   // Scale canvas
@@ -32,16 +32,16 @@ function init({
 
   synth.play();
 
-  addEventListener('waveChanged', () => {
+  addEventListener("waveChanged", () => {
     synth.setWavetable(loopReader.sampleData);
     synth.setPitch(220);
   });
 
-  addEventListener('bufferUpdated', () => {
+  addEventListener("bufferUpdated", () => {
     waveformDisplay.updateBuffer(synth.getBuffer());
   });
 
-  document.getElementById('myFile').onchange = function (evt) {
+  document.getElementById("myFile").onchange = function (evt) {
     const tgt = evt.target || window.event.srcElement,
       files = tgt.files;
 
@@ -51,7 +51,7 @@ function init({
       fr.onload = () => image.src = fr.result;
       fr.readAsDataURL(files[0]);
     }
-  }
+  };
 }
 
 export const ImageWave = { init, resume, pause };

@@ -1,6 +1,6 @@
 import { rgbaToLuma } from "./util/colour.ts";
 import { normalise } from "./util/array.ts";
-import { circle } from './util/shape.ts';
+import { circle } from "./util/shape.ts";
 import { getImageCoordinates } from "./image-readers/helpers.ts";
 
 interface LoopReaderOptions {
@@ -33,7 +33,7 @@ export class LoopReader {
     this.locked = true;
 
     // Update buffer when image changes
-    this.img.addEventListener('load', () => {
+    this.img.addEventListener("load", () => {
       this.setBuffer();
       this.setRadius(this.img.width / 20);
       this.setPosition({ x: this.img.width / 2, y: this.img.height / 2 });
@@ -43,57 +43,74 @@ export class LoopReader {
 
   registerHandlers() {
     const positionHandler = (e) => {
-      if (!this.r)
+      if (!this.r) {
         return;
+      }
       e.preventDefault();
       const { x, y } = getImageCoordinates(e);
-      if (x < this.r || x >= this.img.width - this.r || y < this.r || y >= this.img.height - this.r)
+      if (
+        x < this.r || x >= this.img.width - this.r || y < this.r ||
+        y >= this.img.height - this.r
+      ) {
         return;
+      }
       this.setPosition({ x, y });
     };
-    this.canvas.addEventListener('mousedown', (e) => {
-      this.unlock()
+    this.canvas.addEventListener("mousedown", (e) => {
+      this.unlock();
       positionHandler(e);
     });
-    this.canvas.addEventListener('mousemove', positionHandler);
-    this.canvas.addEventListener('mouseup', (e) => {
-      this.lock()
+    this.canvas.addEventListener("mousemove", positionHandler);
+    this.canvas.addEventListener("mouseup", (e) => {
+      this.lock();
       positionHandler(e);
     });
-    this.canvas.addEventListener('touchstart', () => this.unlock());
-    this.canvas.addEventListener('touchmove', positionHandler);
-    this.canvas.addEventListener('touchend', () => this.lock());
+    this.canvas.addEventListener("touchstart", () => this.unlock());
+    this.canvas.addEventListener("touchmove", positionHandler);
+    this.canvas.addEventListener("touchend", () => this.lock());
   }
 
   setBuffer() {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     const aspect = this.img.naturalWidth / this.img.naturalHeight;
     const maxWidth = Math.sqrt(16777216 * aspect);
     canvas.width = Math.min(this.img.naturalWidth, Math.floor(maxWidth));
-    canvas.height = Math.min(this.img.naturalHeight, Math.floor(maxWidth / aspect));
+    canvas.height = Math.min(
+      this.img.naturalHeight,
+      Math.floor(maxWidth / aspect),
+    );
     ctx.drawImage(this.img, 0, 0, canvas.width, canvas.height);
-    this.scale = [canvas.width / this.img.width, canvas.height / this.img.height];
+    this.scale = [
+      canvas.width / this.img.width,
+      canvas.height / this.img.height,
+    ];
     this.imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   }
 
   private sampleWaveform() {
-    if (this.sampling) return
+    if (this.sampling) return;
     this.sampling = true;
     const scaledX = this.x * this.scale[0];
     const scaledY = this.y * this.scale[1];
     const scaledR = this.r * this.scale[0];
-    const samplePoints = circle(scaledX, scaledY, scaledR, this.samples).map(c => c.map(Math.round));
-    
+    const samplePoints = circle(scaledX, scaledY, scaledR, this.samples).map(
+      (c) => c.map(Math.round),
+    );
+
     const getLumaAtCoordinates = ([x, y]: [number, number]) => {
-      if (x < 0 || x >= this.imageData.width || y < 0 || y >= this.imageData.height)
-      return;
+      if (
+        x < 0 || x >= this.imageData.width || y < 0 ||
+        y >= this.imageData.height
+      ) {
+        return;
+      }
       const i = (x + y * this.imageData.width) * 4;
       return rgbaToLuma(this.imageData.data.slice(i, i + 4));
     };
-    
+
     this.sampleData = normalise(samplePoints.map(getLumaAtCoordinates));
-    const waveChanged = new Event('waveChanged');
+    const waveChanged = new Event("waveChanged");
     dispatchEvent(waveChanged);
     this.sampling = false;
   }
@@ -119,20 +136,21 @@ export class LoopReader {
   }
 
   draw() {
-    const ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
+    const ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
     this.canvas.width = this.img.width;
     this.canvas.height = this.img.height;
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     const cursorPoints = circle(this.x, this.y, this.r, this.samples);
     ctx.lineWidth = this.canvas.width / 100;
-    ctx.strokeStyle = 'rgb(200, 245, 200)';
+    ctx.strokeStyle = "rgb(200, 245, 200)";
     ctx.beginPath();
     for (let i = 0; i < cursorPoints.length; i++) {
-      if (i === 0)
+      if (i === 0) {
         ctx.moveTo(...cursorPoints[i]);
-      else
+      } else {
         ctx.lineTo(...cursorPoints[i]);
+      }
     }
     ctx.closePath();
     ctx.stroke();

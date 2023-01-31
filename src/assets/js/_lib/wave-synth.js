@@ -1,4 +1,4 @@
-import { audioContext } from './audio-subsystem.js';
+import { audioContext } from "./audio-subsystem.js";
 
 export class WaveSynth {
   constructor() {
@@ -13,15 +13,19 @@ export class WaveSynth {
     this.fullGain = 0.1;
     this.setGain(this.fullGain);
     this.playing = false;
-    addEventListener('bufferUpdated', (e) => {
+    addEventListener("bufferUpdated", (e) => {
       if (e.detail.buffer !== this.buffer) return;
       if (this.playing) this.loadWavetable();
-    })
+    });
   }
 
   setWavetable(wave) {
     const cycles = 1;
-    this.buffer = audioContext.createBuffer(2, wave.length * cycles, audioContext.sampleRate);
+    this.buffer = audioContext.createBuffer(
+      2,
+      wave.length * cycles,
+      audioContext.sampleRate,
+    );
     this.playbackRateAdjustment = wave.length / audioContext.sampleRate;
 
     function* gen() {
@@ -39,11 +43,13 @@ export class WaveSynth {
         nowBuffering[i] = waveform.next().value;
       }
     }
-    dispatchEvent(new CustomEvent('bufferUpdated', {
-      detail: {
-        buffer: this.buffer
-      }
-    }));
+    dispatchEvent(
+      new CustomEvent("bufferUpdated", {
+        detail: {
+          buffer: this.buffer,
+        },
+      }),
+    );
   }
 
   getBuffer() {
@@ -64,19 +70,25 @@ export class WaveSynth {
       // Connect gain to destination.
       gainNode.connect(this.gainNode);
       gainNode.gain.setValueAtTime(0.001, audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + rampTime)
+      gainNode.gain.linearRampToValueAtTime(
+        1,
+        audioContext.currentTime + rampTime,
+      );
       wave.start();
       return {
         setPitch: (pitch) => wave.playbackRate.value = pitch,
         fadeOut: () => {
-          gainNode.gain.linearRampToValueAtTime(0.00, audioContext.currentTime + rampTime);
+          gainNode.gain.linearRampToValueAtTime(
+            0.00,
+            audioContext.currentTime + rampTime,
+          );
           setTimeout(() => {
             wave.stop();
             wave.disconnect();
           }, rampTime * 1000);
         },
       };
-    }
+    };
     const oldSource = this.source;
     this.source = createSource(this.buffer, rampTime);
     if (oldSource) oldSource.fadeOut();
@@ -89,7 +101,9 @@ export class WaveSynth {
     return this;
   }
   setPitch(frequency) {
-    if (this.source) this.source.setPitch(frequency * this.playbackRateAdjustment);
+    if (this.source) {
+      this.source.setPitch(frequency * this.playbackRateAdjustment);
+    }
   }
   setGain(gain) {
     this.gainNode.gain.setValueAtTime(gain, audioContext.currentTime);

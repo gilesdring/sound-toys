@@ -42,7 +42,11 @@ export class OrbitCursor {
     this.refresh();
   }
   refresh() {
-    dispatchEvent(new CustomEvent('cursorMoved', { detail: { cursor: this, x: this.x, y: this.y, r: this.r } }));
+    dispatchEvent(
+      new CustomEvent("cursorMoved", {
+        detail: { cursor: this, x: this.x, y: this.y, r: this.r },
+      }),
+    );
   }
   registerHandlers() {
     const positionHandler = (e) => {
@@ -52,33 +56,42 @@ export class OrbitCursor {
       if (coordinates === undefined) return;
       const { x, y } = coordinates;
       const r = this.r * this.canvas.width;
-      if (x < r || x >= this.canvas.width - r || y < r || y >= this.canvas.height - r) return;
+      if (
+        x < r || x >= this.canvas.width - r || y < r ||
+        y >= this.canvas.height - r
+      ) return;
       this.setPosition(x / this.canvas.width, y / this.canvas.height);
     };
-    this.canvas.addEventListener('mousedown', (e) => {
+    this.canvas.addEventListener("mousedown", (e) => {
       this.locked = false;
-      positionHandler(e);      
+      positionHandler(e);
     });
-    this.canvas.addEventListener('mousemove', positionHandler);
-    this.canvas.addEventListener('mouseup', (e) => {
+    this.canvas.addEventListener("mousemove", positionHandler);
+    this.canvas.addEventListener("mouseup", (e) => {
       this.locked = true;
       positionHandler(e);
     });
-    this.canvas.addEventListener('touchstart', () => this.locked = false);
-    this.canvas.addEventListener('touchmove', positionHandler);
-    this.canvas.addEventListener('touchend', () => this.locked = true);
+    this.canvas.addEventListener("touchstart", () => this.locked = false);
+    this.canvas.addEventListener("touchmove", positionHandler);
+    this.canvas.addEventListener("touchend", () => this.locked = true);
   }
   draw() {
-    const ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
-    const cursorPoints = circle(this.x * this.canvas.width, this.y * this.canvas.height, this.r * this.canvas.width, this.samples);
+    const ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
+    const cursorPoints = circle(
+      this.x * this.canvas.width,
+      this.y * this.canvas.height,
+      this.r * this.canvas.width,
+      this.samples,
+    );
     ctx.lineWidth = Math.max(2, this.canvas.width / 100);
-    ctx.strokeStyle = 'rgb(200, 245, 200)';
+    ctx.strokeStyle = "rgb(200, 245, 200)";
     ctx.beginPath();
     for (let i = 0; i < cursorPoints.length; i++) {
-      if (i === 0)
+      if (i === 0) {
         ctx.moveTo(...cursorPoints[i]);
-      else
+      } else {
         ctx.lineTo(...cursorPoints[i]);
+      }
     }
     ctx.closePath();
     ctx.stroke();

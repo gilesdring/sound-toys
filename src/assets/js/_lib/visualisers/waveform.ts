@@ -16,12 +16,12 @@ export class DisplayWaveform {
     buffer,
     id,
     cycles = 4,
-    lineWidth = 2
+    lineWidth = 2,
   }: DisplayWaveformOptions) {
     const canvas = document.getElementById(id) as HTMLCanvasElement;
     if (!canvas) throw new Error(`Cannot find canvas with id ${id}`);
-    const canvasCtx = canvas.getContext('2d');
-    if (!canvasCtx) throw new Error('Failed to load canvas context');
+    const canvasCtx = canvas.getContext("2d");
+    if (!canvasCtx) throw new Error("Failed to load canvas context");
 
     this.canvas = canvas;
     this.canvasCtx = canvasCtx;
@@ -41,17 +41,17 @@ export class DisplayWaveform {
     const WIDTH = this.canvas.width;
     const HEIGHT = this.canvas.height;
     const sliceWidth = WIDTH / this.cycles / data.length;
-  
+
     this.canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
-  
+
     this.canvasCtx.lineWidth = this.lineWidth;
-    this.canvasCtx.strokeStyle = 'rgb(200, 245, 200)';
+    this.canvasCtx.strokeStyle = "rgb(200, 245, 200)";
     this.canvasCtx.beginPath();
-  
+
     for (let i = 0; i < data.length * this.cycles; i++) {
-      const y = ((1 - (data[i % data.length] * 0.9))) * HEIGHT / 2;
+      const y = (1 - (data[i % data.length] * 0.9)) * HEIGHT / 2;
       const x = i * sliceWidth;
-  
+
       if (i === 0) {
         this.canvasCtx.moveTo(x, y);
       } else {
@@ -59,6 +59,6 @@ export class DisplayWaveform {
       }
       if (x > WIDTH) break;
     }
-    this.canvasCtx.stroke();    
+    this.canvasCtx.stroke();
   }
 }

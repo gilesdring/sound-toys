@@ -1,6 +1,6 @@
-import { audioContext as audioCtx } from './_lib/audio-subsystem.js';
-import { DisplayWaveform } from './_lib/visualisers/waveform.ts';
-import { visualize } from './_lib/visualisers/signal.ts';
+import { audioContext as audioCtx } from "./_lib/audio-subsystem.js";
+import { DisplayWaveform } from "./_lib/visualisers/waveform.ts";
+import { visualize } from "./_lib/visualisers/signal.ts";
 
 const sampleRate = audioCtx.sampleRate;
 
@@ -23,7 +23,7 @@ function* waveTableGen(): Generator<number> {
     return 0.5 * Math.sin(2 * theta) +
       0.45 * Math.sin(4 * theta) +
       0.3 * Math.sin(6 * theta);
-  }
+  };
   for (let i = 0; i < size; i++) buffer[i] = wtf(i);
 
   // Loop round the buffer
@@ -50,7 +50,8 @@ for (let channel = 0; channel < arrayBuffer.numberOfChannels; channel++) {
  * Factory which returns an octave scaler - converts a number from 0->1 to
  * a multipler from 1 to 2^octaveRange
  */
-const octaveScaler = (octaveRange: number, minOctave = 0) => (value: number) => 2 ** ((value * octaveRange) + minOctave);
+const octaveScaler = (octaveRange: number, minOctave = 0) => (value: number) =>
+  2 ** ((value * octaveRange) + minOctave);
 
 let source: AudioBufferSourceNode;
 const play = () => {
@@ -60,7 +61,7 @@ const play = () => {
   source.buffer = arrayBuffer;
   source.connect(gainNode);
   source.start();
-}
+};
 const stop = () => source.stop();
 
 const pitchRange = octaveScaler(3, -2);
@@ -75,13 +76,13 @@ const setPitchAndVolume = (e: Event) => {
   const pos = {
     x: xPos - shape.left,
     y: yPos - shape.top,
-  }
+  };
   const pitch = pitchRange(pos.x / shape.width);
 
   const gain = 1 - (pos.y / shape.height);
   source.playbackRate.value = pitch * playbackRateAdjustment;
   gainNode.gain.value = gain;
-}
+};
 let playing = false;
 const toggle = () => {
   if (!playing) {
@@ -91,16 +92,26 @@ const toggle = () => {
     playing = false;
     stop();
   }
-}
+};
 
-const controlSurface = document.querySelector('#control-surface');
-if (!controlSurface) throw new Error('No control surface defined')
+const controlSurface = document.querySelector("#control-surface");
+if (!controlSurface) throw new Error("No control surface defined");
 
-controlSurface.addEventListener("click", (e) => { toggle(); setPitchAndVolume(e); });
+controlSurface.addEventListener("click", (e) => {
+  toggle();
+  setPitchAndVolume(e);
+});
 controlSurface.addEventListener("mousemove", (e) => setPitchAndVolume(e));
-controlSurface.addEventListener("touchstart", (e) => { play(); setPitchAndVolume(e); });
-controlSurface.addEventListener("touchmove", (e) => { setPitchAndVolume(e); });
-controlSurface.addEventListener("touchend", () => { stop(); });
+controlSurface.addEventListener("touchstart", (e) => {
+  play();
+  setPitchAndVolume(e);
+});
+controlSurface.addEventListener("touchmove", (e) => {
+  setPitchAndVolume(e);
+});
+controlSurface.addEventListener("touchend", () => {
+  stop();
+});
 
 const analyser = audioCtx.createAnalyser();
 
@@ -109,7 +120,7 @@ gainNode.connect(analyser);
 visualize({
   id: "oscilloscope",
   analyser,
-  displayType: "waveform"
+  displayType: "waveform",
 });
 
 new DisplayWaveform({

@@ -1,18 +1,18 @@
 export function visualize({
   id,
   analyser,
-  displayType = "waveform"
-}: { id: string, analyser: AnalyserNode, displayType: string}) {
+  displayType = "waveform",
+}: { id: string; analyser: AnalyserNode; displayType: string }) {
   const canvas = document.getElementById(id) as HTMLCanvasElement;
-  if (!canvas) throw new Error('Oscilloscope not defined');
-  const canvasCtx = canvas.getContext('2d') as CanvasRenderingContext2D;
-  if (!canvasCtx) throw new Error('Oscilloscope canvas context not found');
+  if (!canvas) throw new Error("Oscilloscope not defined");
+  const canvasCtx = canvas.getContext("2d") as CanvasRenderingContext2D;
+  if (!canvasCtx) throw new Error("Oscilloscope canvas context not found");
 
   const WIDTH = canvas.width;
   const HEIGHT = canvas.height;
 
   if (displayType === "waveform") {
-    canvas.classList.remove('spectrum');
+    canvas.classList.remove("spectrum");
     analyser.fftSize = 4096;
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
@@ -22,7 +22,7 @@ export function visualize({
       analyser.getByteTimeDomainData(dataArray);
       canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
       canvasCtx.lineWidth = 2;
-      canvasCtx.strokeStyle = 'rgb(0, 255, 0)';
+      canvasCtx.strokeStyle = "rgb(0, 255, 0)";
       canvasCtx.beginPath();
 
       const sliceWidth = WIDTH * 3 / bufferLength;
@@ -47,10 +47,8 @@ export function visualize({
     };
 
     draw();
-
-  }
-  else if (displayType == "frequencybars") {
-    canvas.classList.add('spectrum');
+  } else if (displayType == "frequencybars") {
+    canvas.classList.add("spectrum");
     analyser.fftSize = 256;
     const bufferLengthAlt = analyser.frequencyBinCount;
     console.log(bufferLengthAlt);
@@ -71,7 +69,7 @@ export function visualize({
       for (let i = 0; i < bufferLengthAlt; i++) {
         const barHeight = dataArrayAlt[i];
 
-        canvasCtx.fillStyle = 'rgb(' + (barHeight + 100) + ',50,50)';
+        canvasCtx.fillStyle = "rgb(" + (barHeight + 100) + ",50,50)";
         canvasCtx.fillRect(x, HEIGHT - barHeight / 2, barWidth, barHeight / 2);
 
         x += barWidth + 1;
@@ -79,9 +77,7 @@ export function visualize({
     };
 
     drawAlt();
-
-  }
-  else if (displayType == "off") {
+  } else if (displayType == "off") {
     canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
     canvasCtx.fillStyle = "red";
     canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);

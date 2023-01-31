@@ -10,7 +10,7 @@ export function* sineGen(sampleRate = undefined) {
   do {
     yield Math.sin(step * segment);
     step++;
-  } while (true)
+  } while (true);
 }
 
 /**
@@ -22,5 +22,5 @@ export function* squareGen(sampleRate = undefined) {
   do {
     yield (step % r) / r < 0.5 ? 1 : -1;
     step++;
-  } while (true)
+  } while (true);
 }

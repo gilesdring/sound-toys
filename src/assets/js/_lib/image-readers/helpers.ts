@@ -5,6 +5,6 @@ export function getImageCoordinates(e: Event) {
   const yPos = e.clientY || e.touches[0].clientY;
   return {
     x: Math.floor(xPos - shape.left),
-    y: Math.floor(yPos - shape.top)
-  }
+    y: Math.floor(yPos - shape.top),
+  };
 }
