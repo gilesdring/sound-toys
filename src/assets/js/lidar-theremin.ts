@@ -19,12 +19,14 @@ export class LidarTheremin {
   terrainWalker: OrbitCursor;
   sampler: TerrainSampler;
   synth: WaveSynth;
+  stickyMode: boolean;
 
   constructor(config: LidarThereminConfig) {
     const { image, imageId } = config;
     this.image = image;
 
     this.synth = new WaveSynth();
+    this.stickyMode = false;
 
     const imageRoot = document.getElementById(imageId);
     if (imageRoot === null) throw new Error("Cannot find image root");
@@ -88,7 +90,7 @@ export class LidarTheremin {
     });
     addEventListener("cursorDeactivated", (e) => {
       const { cursor } = (<CustomEvent> e).detail;
-      if (cursor === this.playHead) {
+      if (cursor === this.playHead && !this.stickyMode) {
         this.synth.stop();
       }
     });
@@ -115,13 +117,22 @@ export class LidarTheremin {
     this.terrainWalker.draw();
   }
   setSamplingMode() {
-    this.synth.stop();
+    if (!this.stickyMode) this.synth.stop();
     this.playHead.disable();
     this.terrainWalker.enable();
   }
   setPlayMode() {
     this.terrainWalker.disable();
     this.playHead.enable();
+  }
+  setStickyModeOn() {
+    console.log('Set sticky mode ON');
+    this.stickyMode = true;
+  }
+  setStickyModeOff() {
+    console.log('Set sticky mode OFF');
+    this.stickyMode = false;
+    this.synth.stop();
   }
 }
 

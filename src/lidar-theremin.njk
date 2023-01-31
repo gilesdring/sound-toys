@@ -3,7 +3,7 @@ layout: layouts/base.njk
 title: Lidar Theremin
 ---
 <style>
-  main * + * {
+  main > * + * {
     margin-top: 1em;
   }
   .no-top-margin * + * {
@@ -18,18 +18,25 @@ title: Lidar Theremin
     top: 0;
     left: 0;
   }
-  fieldset {
-    padding: 1rem;
-  }
   #control {
     display: flex;
     gap: 1rem;
   }
+  fieldset {
+    padding: 1rem;
+  }
+  fieldset > * + * {
+    margin-top: 0.5rem;
+  }
+  fieldset > div:first-of-type {
+    margin-top: 0;
+  }
 </style>
 
 <main role="main">
-  <form id="control">
+  <div id="control">
     <fieldset id="mode-selector">
+      <legend for="mode-selector">Mode:</legend>
       <div>
         <input type="radio" id="play-mode" name="mode" value="play"></input>
         <label for="play-mode">Play the landscape</label>
@@ -38,9 +45,15 @@ title: Lidar Theremin
         <input type="radio" id="sample-mode" name="mode" value="sample"></input>
         <label for="sample-mode">Sample the landscape</label>
       </div>
-      <legend for="mode-selector">Mode:</legend>
     </fieldset>
-  </form>
+    <fieldset id="play-params">
+      <legend>Play settings:</legend>
+      <div>
+        <input type="checkbox" id="play-sticky" name="sticky"></input>
+        <label for="play-sticky">Keep the note on</label>
+      </div>
+    </fieldset>
+  </div>
   <div id="image"class="pane no-top-margin">
   </div>
   <div id="visualisation" class="no-top-margin">
@@ -71,8 +84,18 @@ title: Lidar Theremin
           break;;
       }
     })
+
+    document.querySelector('#play-sticky').addEventListener('change', (e) => {
+      if (e.target.checked) {
+        app.setStickyModeOn();
+      } else {
+        app.setStickyModeOff();
+      }
+    })
+
     // Set default mode
     document.querySelector('#mode-selector #play-mode').checked = true;
+    document.querySelector('#play-sticky').checked = false
 
     soundToys.setupVisualisers({
       wave: 'waveform',

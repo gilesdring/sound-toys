@@ -64,10 +64,15 @@ export class WaveSynth {
   loadWavetable() {
     const rampTime = 0.1;
 
-    const createSource = (buffer, rampTime) => {
+    const pitch = this.source?.getPitch()
+    console.log(pitch);
+
+    const createSource = (buffer, rampTime, pitch = 0) => {
       const wave = audioContext.createBufferSource();
       const gainNode = audioContext.createGain();
       wave.buffer = buffer;
+      // Set playback rate
+      wave.playbackRate.value = pitch;
       // Turn on looping
       wave.loop = true;
       // Connect source to gain.
@@ -82,6 +87,7 @@ export class WaveSynth {
       wave.start();
       return {
         setPitch: (pitch) => wave.playbackRate.value = pitch,
+        getPitch: () => wave.playbackRate.value,
         fadeOut: () => {
           gainNode.gain.linearRampToValueAtTime(
             0.00,
@@ -95,7 +101,7 @@ export class WaveSynth {
       };
     };
     const oldSource = this.source;
-    this.source = createSource(this.buffer, rampTime);
+    this.source = createSource(this.buffer, rampTime, pitch);
     if (oldSource) oldSource.fadeOut();
   }
 
