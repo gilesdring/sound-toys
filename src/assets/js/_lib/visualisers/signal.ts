@@ -47,7 +47,7 @@ export function visualize({
     };
 
     draw();
-  } else if (displayType == "frequencybars") {
+  } else if (displayType == "spectrum") {
     canvas.classList.add("spectrum");
     analyser.fftSize = 256;
     const bufferLengthAlt = analyser.frequencyBinCount;

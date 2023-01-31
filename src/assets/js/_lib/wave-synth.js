@@ -51,6 +51,11 @@ export class WaveSynth {
       }),
     );
   }
+  getAnalyser() {
+    const analyser = audioContext.createAnalyser();
+    this.gainNode.connect(analyser);
+    return analyser;
+  }
 
   getBuffer() {
     return this.buffer;

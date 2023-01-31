@@ -127,12 +127,20 @@ export class LidarTheremin {
 
 export function setupVisualisers(config: {
   wave: string;
+  scope: string;
+  analyser: AnalyserNode;
 }) {
-  const { wave } = config;
+  const { wave, scope, analyser } = config;
   const waveformDisplay = new DisplayWaveform({
     id: wave,
     cycles: 3,
     lineWidth: 2,
+  });
+
+  visualize({
+    id: scope,
+    analyser,
+    displayType: "spectrum",
   });
 
   addEventListener("bufferUpdated", (e) => {
