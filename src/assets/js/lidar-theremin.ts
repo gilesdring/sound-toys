@@ -1,5 +1,7 @@
 import { OrbitCursor } from "./_lib/orbit-cursor.ts";
+import { PositionCursor } from "./_lib/position-cursor.ts";
 import { TerrainSampler } from "./_lib/terrain-sampler.ts";
+import { octaveScaler } from "./_lib/util/sound.ts";
 import { visualize } from "./_lib/visualisers/signal.ts";
 import { DisplayWaveform } from "./_lib/visualisers/waveform.ts";
 import { WaveSynth } from "./_lib/wave-synth.js";
@@ -13,7 +15,8 @@ export class LidarTheremin {
   image: URL;
   imageEl: HTMLImageElement;
   overlay: HTMLCanvasElement;
-  cursor: OrbitCursor;
+  playHead: PositionCursor;
+  terrainWalker: OrbitCursor;
   sampler: TerrainSampler;
   synth: WaveSynth;
 
@@ -32,7 +35,11 @@ export class LidarTheremin {
     this.overlay.classList.add("overlay");
     imageRoot.append(this.imageEl, this.overlay);
 
-    this.cursor = new OrbitCursor({
+    this.playHead = new PositionCursor({
+      field: this.overlay,
+    });
+
+    this.terrainWalker = new OrbitCursor({
       x: 0.5,
       y: 0.5,
       r: 0.05,
@@ -46,25 +53,54 @@ export class LidarTheremin {
     // Reset overlay and trigger cursor sample if new image loaded
     this.imageEl.addEventListener("load", () => {
       this.resetOverlay();
-      this.cursor.refresh();
+      this.terrainWalker.refresh();
     });
     // Reset overlay if window changes size
     addEventListener("resize", () => {
       this.resetOverlay();
     });
+
+    const pitchScaler = octaveScaler({
+      octaveRange: 3,
+      minOctave: -2,
+      referenceTone: 440,
+    });
+    const gainScaler = (y: number) => (1 - y) ** 3;
+
     // Sample terrain and draw overlay when cursor has moved
     addEventListener("cursorMoved", (e) => {
-      if ((<CustomEvent> e).detail.cursor !== this.cursor) return;
-      this.sampler.sampleWaveform(this.cursor);
-      this.drawOverlay();
+      const { cursor } = (<CustomEvent> e).detail;
+      if (cursor === this.terrainWalker) {
+        this.sampler.sampleWaveform(this.terrainWalker);
+        this.drawOverlay();
+      }
+      if (cursor === this.playHead) {
+        this.synth.setPitch(pitchScaler(this.playHead.x));
+        this.synth.setGain(gainScaler(this.playHead.y));
+        this.drawOverlay();
+      }
     });
+
+    addEventListener("cursorActivated", (e) => {
+      const { cursor } = (<CustomEvent> e).detail;
+      if (cursor === this.playHead) {
+        this.synth.play();
+      }
+    });
+    addEventListener("cursorDeactivated", (e) => {
+      const { cursor } = (<CustomEvent> e).detail;
+      if (cursor === this.playHead) {
+        this.synth.stop();
+      }
+    });
+
     // Set wavetable if wave has changed
     addEventListener("waveChanged", (e) => {
       if ((<CustomEvent> e).detail.sampler !== this.sampler) return;
       this.synth.setWavetable(this.sampler.sampleData);
-      this.synth.setPitch(220);
     });
     this.setImage();
+    this.setPlayMode();
   }
   private setImage() {
     this.imageEl.src = this.image.toString();
@@ -77,13 +113,15 @@ export class LidarTheremin {
   private drawOverlay() {
     const ctx = this.overlay.getContext("2d") as CanvasRenderingContext2D;
     ctx.clearRect(0, 0, this.overlay.width, this.overlay.height);
-    this.cursor.draw();
+    this.terrainWalker.draw();
   }
   setSamplingMode() {
-    this.cursor.activate();
+    this.playHead.disable();
+    this.terrainWalker.activate();
   }
   setPlayMode() {
-    this.cursor.deactivate();
+    this.terrainWalker.deactivate();
+    this.playHead.enable();
   }
 }
 
@@ -94,6 +132,7 @@ export function setupVisualisers(config: {
   const waveformDisplay = new DisplayWaveform({
     id: wave,
     cycles: 3,
+    lineWidth: 2,
   });
 
   addEventListener("bufferUpdated", (e) => {

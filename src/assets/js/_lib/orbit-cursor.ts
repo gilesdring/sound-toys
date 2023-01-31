@@ -49,7 +49,7 @@ export class OrbitCursor {
     );
   }
   registerHandlers() {
-    const positionHandler = (e) => {
+    const positionHandler = (e: Event) => {
       if (this.locked || !this.active || !this.r) return;
       e.preventDefault();
       const coordinates = getImageCoordinates(e);
@@ -75,6 +75,7 @@ export class OrbitCursor {
     this.canvas.addEventListener("touchmove", positionHandler);
     this.canvas.addEventListener("touchend", () => this.locked = true);
   }
+  // TODO refactor to a separate class / function
   draw() {
     const ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
     const cursorPoints = circle(

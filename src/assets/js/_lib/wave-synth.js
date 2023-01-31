@@ -95,7 +95,6 @@ export class WaveSynth {
   }
 
   play() {
-    this.setGain(this.fullGain);
     this.playing = true;
     this.loadWavetable();
     return this;
