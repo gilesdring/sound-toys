@@ -64,7 +64,7 @@ export class WaveSynth {
   loadWavetable() {
     const rampTime = 0.1;
 
-    const pitch = this.source?.getPitch()
+    const pitch = this.source?.getPitch();
 
     const createSource = (buffer, rampTime, pitch) => {
       const wave = audioContext.createBufferSource();
@@ -72,6 +72,13 @@ export class WaveSynth {
       wave.buffer = buffer;
       // Set playback rate
       if (pitch) wave.playbackRate.value = pitch;
+      const setPitch = (newPitch) => {
+        if (!newPitch) return;
+        wave.playbackRate.exponentialRampToValueAtTime(
+          newPitch,
+          audioContext.currentTime + 0.1,
+        );
+      };
       // Turn on looping
       wave.loop = true;
       // Connect source to gain.
@@ -85,7 +92,7 @@ export class WaveSynth {
       );
       wave.start();
       return {
-        setPitch: (pitch) => wave.playbackRate.value = pitch,
+        setPitch,
         getPitch: () => wave.playbackRate.value,
         fadeOut: () => {
           gainNode.gain.linearRampToValueAtTime(
@@ -114,10 +121,16 @@ export class WaveSynth {
       this.source.setPitch(frequency * this.playbackRateAdjustment);
     }
   }
-  setGain(gain) {
-    this.gainNode.gain.setValueAtTime(gain, audioContext.currentTime);
+  setGain(gain, when = 0.01) {
+    this.gainNode.gain.linearRampToValueAtTime(
+      gain,
+      audioContext.currentTime + when,
+    );
   }
   stop() {
     this.setGain(0);
+  }
+  fadeOut(decay = 0.5) {
+    this.setGain(0, decay);
   }
 }

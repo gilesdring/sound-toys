@@ -130,7 +130,7 @@ export class LidarTheremin {
   }
   setStickyModeOff() {
     this.stickyMode = false;
-    this.synth.stop();
+    this.synth.fadeOut();
   }
 }
 

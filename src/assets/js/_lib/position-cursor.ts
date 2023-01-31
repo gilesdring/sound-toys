@@ -66,7 +66,10 @@ export class PositionCursor {
     const coordinates = getImageCoordinates(e);
     if (coordinates === undefined) return;
     const { scaledX: x, scaledY: y, aspect } = coordinates;
-    if (x < this.border || x >= 1 - this.border || y < (this.border / aspect) || y >= 1 - (this.border / aspect)) return;
+    if (
+      x < this.border || x >= 1 - this.border || y < (this.border / aspect) ||
+      y >= 1 - (this.border / aspect)
+    ) return;
     this.setPosition(x, y);
   }
   registerHandlers() {
