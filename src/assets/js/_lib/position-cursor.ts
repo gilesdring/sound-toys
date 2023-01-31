@@ -2,7 +2,7 @@ import { getImageCoordinates } from "./image-readers/helpers.ts";
 
 interface PositionCursorConfig {
   field: HTMLElement;
-  border: number;
+  border?: number;
 }
 
 export class PositionCursor {
