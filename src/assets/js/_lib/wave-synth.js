@@ -12,6 +12,11 @@ export class WaveSynth {
     this.playbackRateAdjustment = 1;
     this.fullGain = 0.1;
     this.setGain(this.fullGain);
+    this.playing = false;
+    addEventListener('bufferUpdated', (e) => {
+      if (e.detail.buffer !== this.buffer) return;
+      if (this.playing) this.loadWavetable();
+    })
   }
 
   setWavetable(wave) {
@@ -39,7 +44,6 @@ export class WaveSynth {
         buffer: this.buffer
       }
     }));
-    this.loadWavetable();
   }
 
   getBuffer() {
@@ -80,11 +84,12 @@ export class WaveSynth {
 
   play() {
     this.setGain(this.fullGain);
+    this.playing = true;
     this.loadWavetable();
     return this;
   }
   setPitch(frequency) {
-    this.source.setPitch(frequency * this.playbackRateAdjustment);
+    if (this.source) this.source.setPitch(frequency * this.playbackRateAdjustment);
   }
   setGain(gain) {
     this.gainNode.gain.setValueAtTime(gain, audioContext.currentTime);
