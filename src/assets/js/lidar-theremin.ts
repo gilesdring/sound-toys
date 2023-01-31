@@ -116,6 +116,7 @@ export class LidarTheremin {
     this.terrainWalker.draw();
   }
   setSamplingMode() {
+    this.synth.stop();
     this.playHead.disable();
     this.terrainWalker.enable();
   }

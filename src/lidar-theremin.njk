@@ -18,13 +18,29 @@ title: Lidar Theremin
     top: 0;
     left: 0;
   }
+  fieldset {
+    padding: 1rem;
+  }
+  #control {
+    display: flex;
+    gap: 1rem;
+  }
 </style>
 
 <main role="main">
-  <div id="control">
-    <button id="play-wave">Play theremin</button>
-    <button id="set-wave">Select wave terrain orbit</button>
-  </div>
+  <form id="control">
+    <fieldset id="mode-selector">
+      <div>
+        <input type="radio" id="play-mode" name="mode" value="play"></input>
+        <label for="play-mode">Play the landscape</label>
+      </div>
+      <div>
+        <input type="radio" id="sample-mode" name="mode" value="sample"></input>
+        <label for="sample-mode">Sample the landscape</label>
+      </div>
+      <legend for="mode-selector">Mode:</legend>
+    </fieldset>
+  </form>
   <div id="image"class="pane no-top-margin">
   </div>
   <div id="visualisation" class="no-top-margin">
@@ -41,8 +57,22 @@ title: Lidar Theremin
       imageId: 'image',
     });
 
-    document.querySelector('#set-wave').addEventListener('click', () => app.setSamplingMode());
-    document.querySelector('#play-wave').addEventListener('click', () => app.setPlayMode());
+    document.querySelector('#mode-selector').addEventListener('change', (e) => {
+      const mode = e.target.value;
+      switch (mode) {
+        case 'play':
+          app.setPlayMode();
+          break;;
+        case 'sample':
+          app.setSamplingMode();
+          break;;
+        default:
+          console.warning(`Unkown mode: ${mode}`);
+          break;;
+      }
+    })
+    // Set default mode
+    document.querySelector('#mode-selector #play-mode').checked = true;
 
     soundToys.setupVisualisers({
       wave: 'waveform',
