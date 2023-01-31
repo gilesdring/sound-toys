@@ -117,10 +117,10 @@ export class LidarTheremin {
   }
   setSamplingMode() {
     this.playHead.disable();
-    this.terrainWalker.activate();
+    this.terrainWalker.enable();
   }
   setPlayMode() {
-    this.terrainWalker.deactivate();
+    this.terrainWalker.disable();
     this.playHead.enable();
   }
 }

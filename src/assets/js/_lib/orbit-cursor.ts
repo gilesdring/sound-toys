@@ -1,4 +1,5 @@
 import { getImageCoordinates } from "./image-readers/helpers.ts";
+import { PositionCursor } from "./position-cursor.ts";
 import { circle } from "./util/shape.ts";
 
 interface OrbitCursorConfig {
@@ -9,71 +10,33 @@ interface OrbitCursorConfig {
   samples?: number;
 }
 
-export class OrbitCursor {
-  x: number;
-  y: number;
+export class OrbitCursor extends PositionCursor {
   r: number;
   samples: number;
   canvas: HTMLCanvasElement;
-  private active: boolean;
-  private locked: boolean;
 
   constructor(config: OrbitCursorConfig) {
     const { x, y, r, canvas, samples = 64 } = config;
-    this.x = x;
-    this.y = y;
+    super({
+      field: canvas,
+    });
     this.r = r;
     this.samples = samples;
     this.canvas = canvas;
-    this.active = false;
-    this.locked = true;
     this.registerHandlers();
-    this.refresh();
+    this.setPosition(x, y);
   }
-  activate() {
-    this.active = true;
-  }
-  deactivate() {
-    this.active = false;
-  }
-  setPosition(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-    this.refresh();
-  }
-  refresh() {
-    dispatchEvent(
-      new CustomEvent("cursorMoved", {
-        detail: { cursor: this, x: this.x, y: this.y, r: this.r },
-      }),
-    );
-  }
-  registerHandlers() {
-    const positionHandler = (e: Event) => {
-      if (this.locked || !this.active || !this.r) return;
-      e.preventDefault();
-      const coordinates = getImageCoordinates(e);
-      if (coordinates === undefined) return;
-      const { x, y } = coordinates;
-      const r = this.r * this.canvas.width;
-      if (
-        x < r || x >= this.canvas.width - r || y < r ||
-        y >= this.canvas.height - r
-      ) return;
-      this.setPosition(x / this.canvas.width, y / this.canvas.height);
-    };
-    this.canvas.addEventListener("mousedown", (e) => {
-      this.locked = false;
-      positionHandler(e);
-    });
-    this.canvas.addEventListener("mousemove", positionHandler);
-    this.canvas.addEventListener("mouseup", (e) => {
-      this.locked = true;
-      positionHandler(e);
-    });
-    this.canvas.addEventListener("touchstart", () => this.locked = false);
-    this.canvas.addEventListener("touchmove", positionHandler);
-    this.canvas.addEventListener("touchend", () => this.locked = true);
+  positionHandler(e: Event) {
+    if (!this.enabled || !this.active || !this.r) return;
+    e.preventDefault();
+    const coordinates = getImageCoordinates(e);
+    if (coordinates === undefined) return;
+    const { scaledX: x, scaledY: y } = coordinates;
+    if (
+      x < this.r || x >= 1 - this.r || y < this.r ||
+      y >= 1 - this.r
+    ) return;
+    this.setPosition(x, y);
   }
   // TODO refactor to a separate class / function
   draw() {
