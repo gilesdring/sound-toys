@@ -19,6 +19,7 @@ export class OrbitCursor extends PositionCursor {
     const { x, y, r, canvas, samples = 64 } = config;
     super({
       field: canvas,
+      border: r,
     });
     this.r = r;
     this.samples = samples;

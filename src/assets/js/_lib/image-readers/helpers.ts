@@ -5,11 +5,13 @@ export function getImageCoordinates(e: Event) {
   const yPos = e.clientY || e.touches[0].clientY;
   const x = Math.floor(xPos - shape.left);
   const y = Math.floor(yPos - shape.top);
+  const aspect = x / y;
 
   return {
     x,
     y,
     scaledX: x / shape.width,
     scaledY: y / shape.height,
+    aspect,
   };
 }

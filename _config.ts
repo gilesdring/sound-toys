@@ -18,6 +18,6 @@ site
   }))
   .use(base_path())
   .use(postcss())
-  .copy([".png"]);
+  .copy([".png", ".jpg"]);
 
 export default site;

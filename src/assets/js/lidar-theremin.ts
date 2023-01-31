@@ -12,7 +12,7 @@ interface LidarThereminConfig {
 }
 
 export class LidarTheremin {
-  image: URL;
+  image: string;
   imageEl: HTMLImageElement;
   overlay: HTMLCanvasElement;
   playHead: PositionCursor;
@@ -22,8 +22,7 @@ export class LidarTheremin {
 
   constructor(config: LidarThereminConfig) {
     const { image, imageId } = config;
-    this.image = new URL(window.location.toString());
-    this.image.pathname = image;
+    this.image = image;
 
     this.synth = new WaveSynth();
 

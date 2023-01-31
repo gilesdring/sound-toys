@@ -2,18 +2,22 @@ import { getImageCoordinates } from "./image-readers/helpers.ts";
 
 interface PositionCursorConfig {
   field: HTMLElement;
+  border: number;
 }
 
 export class PositionCursor {
   x!: number;
   y!: number;
   field: HTMLElement;
+  border: number;
 
   active: boolean;
   enabled: boolean;
   constructor(config: PositionCursorConfig) {
-    const { field } = config;
+    const { field, border = 0 } = config;
     this.field = field;
+    this.border = border;
+
     this.active = false;
     this.enabled = false;
     this.registerHandlers();
@@ -61,8 +65,8 @@ export class PositionCursor {
     e.preventDefault();
     const coordinates = getImageCoordinates(e);
     if (coordinates === undefined) return;
-    const { scaledX: x, scaledY: y } = coordinates;
-    if (x < 0 || x >= 1 || y < 0 || y >= 1) return;
+    const { scaledX: x, scaledY: y, aspect } = coordinates;
+    if (x < this.border || x >= 1 - this.border || y < (this.border / aspect) || y >= 1 - (this.border / aspect)) return;
     this.setPosition(x, y);
   }
   registerHandlers() {
