@@ -126,11 +126,9 @@ export class LidarTheremin {
     this.playHead.enable();
   }
   setStickyModeOn() {
-    console.log('Set sticky mode ON');
     this.stickyMode = true;
   }
   setStickyModeOff() {
-    console.log('Set sticky mode OFF');
     this.stickyMode = false;
     this.synth.stop();
   }

@@ -65,14 +65,13 @@ export class WaveSynth {
     const rampTime = 0.1;
 
     const pitch = this.source?.getPitch()
-    console.log(pitch);
 
-    const createSource = (buffer, rampTime, pitch = 0) => {
+    const createSource = (buffer, rampTime, pitch) => {
       const wave = audioContext.createBufferSource();
       const gainNode = audioContext.createGain();
       wave.buffer = buffer;
       // Set playback rate
-      wave.playbackRate.value = pitch;
+      if (pitch) wave.playbackRate.value = pitch;
       // Turn on looping
       wave.loop = true;
       // Connect source to gain.
