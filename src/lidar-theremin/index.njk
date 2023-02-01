@@ -65,42 +65,21 @@ title: Lidar Theremin
 <script src="/assets/js/lidar-theremin.js"></script>
 <script>
   addEventListener('DOMContentLoaded', () => {
-    const app = new soundToys.LidarTheremin({
-      image: '{{ "/assets/images/LIDAR-DTM-2M-SD84sw.png" | url }}',
-      imageId: 'image',
-    });
-
-    document.querySelector('#mode-selector').addEventListener('change', (e) => {
-      const mode = e.target.value;
-      switch (mode) {
-        case 'play':
-          app.setPlayMode();
-          break;;
-        case 'sample':
-          app.setSamplingMode();
-          break;;
-        default:
-          console.warning(`Unkown mode: ${mode}`);
-          break;;
+    soundToys.init({
+      initialImage: '{{ "/assets/images/LIDAR-DTM-2M-SD84sw.png" | url }}',
+      ui: {
+        controls: {
+          image: 'image',
+          mode: 'mode-selector',
+          play: 'play-mode',
+          sample: 'sample-mode',
+          sticky: 'play-sticky',
+        },
+        viz: {
+          wave: 'waveform',
+          scope: 'oscilloscope',
+        }
       }
-    })
-
-    document.querySelector('#play-sticky').addEventListener('change', (e) => {
-      if (e.target.checked) {
-        app.setStickyModeOn();
-      } else {
-        app.setStickyModeOff();
-      }
-    })
-
-    // Set default mode
-    document.querySelector('#mode-selector #play-mode').checked = true;
-    document.querySelector('#play-sticky').checked = false
-
-    soundToys.setupVisualisers({
-      wave: 'waveform',
-      scope: "oscilloscope",
-      analyser: app.synth.getAnalyser(),
     });
   })
 </script>

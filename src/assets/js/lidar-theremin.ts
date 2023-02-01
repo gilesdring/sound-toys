@@ -134,25 +134,66 @@ export class LidarTheremin {
   }
 }
 
-export function setupVisualisers(config: {
-  wave: string;
-  scope: string;
-  analyser: AnalyserNode;
-}) {
-  const { wave, scope, analyser } = config;
+interface LidarThereminAppConfig {
+  initialImage: string,
+  ui: {
+    [purpose: string]: {
+      [element: string]: string;
+    }
+  }
+}
+
+export function init(config: LidarThereminAppConfig) {
+  const { initialImage, ui } = config;
+
+  const app = new LidarTheremin({
+    image: initialImage,
+    imageId: ui.controls.image,
+  });
+
+  document.querySelector(`#${ui.controls.mode}`)!.addEventListener('change', (e) => {
+    const mode = e.target.value;
+    switch (mode) {
+      case 'play':
+        app.setPlayMode();
+        break;
+      case 'sample':
+        app.setSamplingMode();
+        break;
+      default:
+        console.warn(`Unkown mode: ${mode}`);
+        break;
+    }
+  })
+
+  document.querySelector(`#${ui.controls.sticky}`)!.addEventListener('change', (e) => {
+    if (e.target.checked) {
+      app.setStickyModeOn();
+    } else {
+      app.setStickyModeOff();
+    }
+  })
+
+  // Set default mode
+  document.querySelector(`#${ui.controls.play}`)!.checked = true;
+  document.querySelector(`#${ui.controls.sticky}`)!.checked = false
+
+  // Set up visualiser
   const waveformDisplay = new DisplayWaveform({
-    id: wave,
+    id: ui.viz.wave,
     cycles: 3,
     lineWidth: 2,
   });
 
   visualize({
-    id: scope,
-    analyser,
+    id: ui.viz.scope,
+    analyser: app.synth.getAnalyser(),
     displayType: "spectrum",
   });
 
-  addEventListener("bufferUpdated", (e) => {
-    waveformDisplay.updateBuffer((<CustomEvent> e).detail.buffer);
+  addEventListener("bufferUpdated", () => {
+    const buffer = app.synth.getBuffer();
+    if (!buffer) return;
+    waveformDisplay.updateBuffer(buffer);
   });
 }
