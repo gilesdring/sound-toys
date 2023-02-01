@@ -47,12 +47,14 @@ body > header > h1 {
 }
 
 #visualisation {
-  height: 100px;
+  height: 20vw;
+  max-height: 8rem;
   margin-top: 10px;
   display: flex;
 }
 
 #waveform {
+  flex-shrink: 1;
   padding: 10px;
   background: rgb(0, 0, 100);
 }
