@@ -21,7 +21,7 @@ export class Droner extends CoreSynth {
         osc.stop();
         osc.disconnect();
       },
-      move(target, time=0.1) {
+      move(target, time = 0.1) {
         osc.frequency.linearRampToValueAtTime(
           target,
           osc.context.currentTime + time,

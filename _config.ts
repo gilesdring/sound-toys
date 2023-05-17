@@ -13,7 +13,7 @@ site
     options: {
       format: "iife",
       globalName: "soundToys",
-      minify: true,
+      // minify: true,
     },
   }))
   .use(base_path())
