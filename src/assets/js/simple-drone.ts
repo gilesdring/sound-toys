@@ -9,14 +9,17 @@ addEventListener("DOMContentLoaded", () => {
 
   const freq = () => (Math.random() * 3 + 1) * 220;
 
-  addButton?.addEventListener("click", () => {
+  addButton?.addEventListener("click", (e: Event) => {
+    e.preventDefault();
     if (!droner) droner = new Droner();
     drones.push(droner.add(freq()));
   });
-  moveButton?.addEventListener("click", () => {
+  moveButton?.addEventListener("click", (e: Event) => {
+    e.preventDefault();
     drones.forEach(drone => drone.move(freq(), 0.01));
   });
-  stopButton?.addEventListener("click", () => {
+  stopButton?.addEventListener("click", (e: Event) => {
+    e.preventDefault();
     while (drones.length > 0) {
       const drone = drones.pop();
       if (drone) drone.stop();
