@@ -12,7 +12,6 @@ const octaveScaler = (octaveRange: number, minOctave = 0) => (value: number) =>
 const pitchRange = octaveScaler(3);
 
 const setPitchAndVolume = (e: MouseEvent & TouchEvent) => {
-  e.preventDefault();
   if (!synth) return;
   if (!e.target) return;
   const target = e.target as HTMLCanvasElement;
@@ -41,24 +40,28 @@ const startSynth = () => {
 };
 
 controlSurface.addEventListener("click", (e) => {
+  e.preventDefault();
   if (!synth) startSynth();
   if (synth?.active) synth.stop();
   else synth?.start();
   setPitchAndVolume(e as MouseEvent & TouchEvent);
 });
-controlSurface.addEventListener(
-  "mousemove",
-  (e) => setPitchAndVolume(e as MouseEvent & TouchEvent),
-);
+controlSurface.addEventListener("mousemove", (e) => {
+  e.preventDefault();
+  setPitchAndVolume(e as MouseEvent & TouchEvent);
+});
 controlSurface.addEventListener("touchstart", (e) => {
+  e.preventDefault();
   if (!synth) startSynth();
   synth?.start();
   setPitchAndVolume(e as MouseEvent & TouchEvent);
 });
 controlSurface.addEventListener("touchmove", (e) => {
+  e.preventDefault();
   setPitchAndVolume(e as MouseEvent & TouchEvent);
 });
-controlSurface.addEventListener("touchend", () => {
+controlSurface.addEventListener("touchend", (e) => {
+  e.preventDefault();
   if (!synth) return;
   synth.stop();
 });
