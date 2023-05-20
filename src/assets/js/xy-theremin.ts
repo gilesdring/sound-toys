@@ -1,7 +1,7 @@
-import { visualize } from "./_lib/visualisers/signal.ts";
 import { SimpleSynth } from "/lib/simple-synth.ts";
-let synth: SimpleSynth | undefined;
+import { Oscilliscope } from "/lib/visualiser/oscilliscope.ts";
 
+let synth: SimpleSynth | undefined;
 /**
  * Factory which returns an octave scaler - converts a number from 0->1 to
  * a multipler from 1 to 2^octaveRange
@@ -32,11 +32,10 @@ if (!controlSurface) throw new Error("No control surface defined");
 
 const startSynth = () => {
   synth = new SimpleSynth();
-  visualize({
-    id: "oscilloscope",
-    analyser: synth.analyser,
-    displayType: "waveform",
-  });
+  new Oscilliscope({
+    canvas: document.getElementById('oscilloscope') as HTMLCanvasElement,
+    analyser: synth.analyser
+  })
 };
 
 controlSurface.addEventListener("click", (e) => {

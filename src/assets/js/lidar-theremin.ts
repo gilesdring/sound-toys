@@ -2,7 +2,7 @@ import { OrbitCursor } from "./_lib/orbit-cursor.ts";
 import { PositionCursor } from "./_lib/position-cursor.ts";
 import { TerrainSampler } from "./_lib/terrain-sampler.ts";
 import { octaveScaler } from "./_lib/util/sound.ts";
-import { visualize } from "./_lib/visualisers/signal.ts";
+import { Oscilliscope } from "../../../lib/visualiser/oscilliscope.ts";
 import { DisplayWaveform } from "./_lib/visualisers/waveform.ts";
 import { WaveSynth } from "./_lib/wave-synth.js";
 
@@ -185,11 +185,10 @@ export function init(config: LidarThereminAppConfig) {
     lineWidth: 2,
   });
 
-  visualize({
-    id: ui.viz.scope,
+  new Oscilliscope({
+    canvas: document.getElementById(ui.viz.scope) as HTMLCanvasElement,
     analyser: app.synth.getAnalyser(),
-    displayType: "spectrum",
-  });
+  })
 
   addEventListener("bufferUpdated", () => {
     const buffer = app.synth.getBuffer();
