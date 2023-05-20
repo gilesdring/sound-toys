@@ -1,9 +1,16 @@
+export interface SynthOptions {
+  portamento?: number;
+}
+
 export class CoreSynth {
   protected context: AudioContext;
   protected bus: GainNode;
   protected master: GainNode;
-  constructor() {
+  protected portamento: number;
+
+  constructor(options: SynthOptions = {}) {
     this.context = new AudioContext();
+    this.portamento = options.portamento || 0.2;
 
     this.bus = this.context.createGain();
 
@@ -20,5 +27,12 @@ export class CoreSynth {
     this.bus.connect(limiter);
     limiter.connect(this.master);
     this.master.connect(this.context.destination);
+  }
+
+  set gain(g: number) {
+    this.master.gain.exponentialRampToValueAtTime(
+      g,
+      this.context.currentTime + this.portamento,
+    );
   }
 }
