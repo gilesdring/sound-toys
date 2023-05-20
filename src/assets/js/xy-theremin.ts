@@ -1,4 +1,4 @@
-import { SimpleSynth } from "/lib/simple-synth.ts";
+import { SimpleSynth } from "/lib/synth/simple-synth.ts";
 import { Oscilliscope } from "/lib/visualiser/oscilliscope.ts";
 
 let synth: SimpleSynth | undefined;

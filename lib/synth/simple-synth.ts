@@ -1,5 +1,5 @@
-import { Analysable } from "./analysable.ts";
-import { CoreSynth } from "./core-synth.ts";
+import { Analysable } from "../analysable.ts";
+import { CoreSynth } from "../core-synth.ts";
 
 export class SimpleSynth extends CoreSynth implements Analysable {
   private osc?: OscillatorNode;
