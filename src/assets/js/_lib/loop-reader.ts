@@ -1,5 +1,5 @@
 import { rgbaToLuma } from "./util/colour.ts";
-import { normalise } from "./util/array.ts";
+import { normalise } from "/lib/util/array.ts";
 import { circle } from "./util/shape.ts";
 import { getImageCoordinates } from "./image-readers/helpers.ts";
 

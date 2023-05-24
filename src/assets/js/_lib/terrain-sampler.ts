@@ -1,4 +1,4 @@
-import { normalise } from "./util/array.ts";
+import { normalise } from "/lib/util/array.ts";
 import { rgbaToLuma } from "./util/colour.ts";
 import { circle } from "./util/shape.ts";
 
