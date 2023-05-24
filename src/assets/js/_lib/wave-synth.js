@@ -1,3 +1,4 @@
+import { bufferFactory } from "../../../../lib/util/buffer-factory.ts";
 import { audioContext } from "./audio-subsystem.js";
 
 export class WaveSynth {
@@ -9,7 +10,6 @@ export class WaveSynth {
     this.gainNode.connect(audioContext.destination);
     this.limiter.connect(this.gainNode);
 
-    this.playbackRateAdjustment = 1;
     this.fullGain = 0.1;
     this.setGain(this.fullGain);
     this.playing = false;
@@ -20,29 +20,8 @@ export class WaveSynth {
   }
 
   setWavetable(wave) {
-    const cycles = 1;
-    this.buffer = audioContext.createBuffer(
-      2,
-      wave.length * cycles,
-      audioContext.sampleRate,
-    );
-    this.playbackRateAdjustment = wave.length / audioContext.sampleRate;
+    this.buffer = bufferFactory({ samples: wave });
 
-    function* gen() {
-      let step = 0;
-      while (true) {
-        yield wave[step % wave.length];
-        step++;
-      }
-    }
-    for (let channel = 0; channel < this.buffer.numberOfChannels; channel++) {
-      // This gives us the actual array that contains the data
-      const nowBuffering = this.buffer.getChannelData(channel);
-      const waveform = gen();
-      for (let i = 0; i < this.buffer.length; i++) {
-        nowBuffering[i] = waveform.next().value;
-      }
-    }
     dispatchEvent(
       new CustomEvent("bufferUpdated", {
         detail: {
@@ -118,7 +97,7 @@ export class WaveSynth {
   }
   setPitch(frequency) {
     if (this.source) {
-      this.source.setPitch(frequency * this.playbackRateAdjustment);
+      this.source.setPitch(frequency * this.buffer.duration);
     }
   }
   setGain(gain, when = 0.01) {
