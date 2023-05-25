@@ -58,4 +58,9 @@ function init({
   };
 }
 
-export const ImageWave = { init, resume, pause };
+addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-action="start"]').forEach(e => e.addEventListener('click', () => resume()));
+  document.querySelectorAll('[data-action="stop"]').forEach(e => e.addEventListener('click', () => pause()));
+});
+
+export const ImageWave = { init };
