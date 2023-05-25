@@ -1,3 +1,5 @@
+import { normalise } from "./array.ts";
+
 interface bufferFactoryOptions {
   samples: number[];
   sampleRate?: number;
@@ -14,7 +16,7 @@ function* samplesGenerator(samples: number[]): Generator<number, never> {
 }
 
 export function bufferFactory(options: bufferFactoryOptions): AudioBuffer {
-  const samples = options.samples;
+  const samples = normalise(options.samples);
   if (!Array.isArray(samples)) throw new TypeError('Invalid sample array passed');
   const audioContext = options.audioContext || new window.AudioContext()
   const sampleRate = options.sampleRate || audioContext.sampleRate;
