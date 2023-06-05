@@ -6,11 +6,16 @@ export class WaveSynth {
   constructor() {
     this.gainNode = audioContext.createGain();
     this.limiter = audioContext.createDynamicsCompressor();
-    this.limiter.attack.value = 0.05;
-    this.limiter.release.value = 0.1;
-    this.gainNode.connect(audioContext.destination);
-    this.limiter.connect(this.gainNode);
 
+    this.limiter.threshold.setValueAtTime(-0.5, audioContext.currentTime);
+    this.limiter.knee.setValueAtTime(0.0, audioContext.currentTime);
+    this.limiter.attack.setValueAtTime(0.001, audioContext.currentTime);
+    this.limiter.ratio.setValueAtTime(20.0, audioContext.currentTime);
+    this.limiter.release.setValueAtTime(0.1, audioContext.currentTime);
+
+    this.gainNode.connect(this.limiter);
+    this.limiter.connect(audioContext.destination);
+    
     this.requestedPitch = 110;
     this.fullGain = 0.1;
     this.setGain(this.fullGain);
