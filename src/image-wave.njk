@@ -30,8 +30,6 @@ refs:
     soundToys.ImageWave.init({
       initialImage: '{{ "/assets/images/LIDAR-DTM-2M-SD84sw.png" | url }}',
     });
-    document.querySelectorAll('[data-action="start"]').forEach(e => e.addEventListener('click', () => soundToys.ImageWave.resume()));
-    document.querySelectorAll('[data-action="stop"]').forEach(e => e.addEventListener('click', () => soundToys.ImageWave.pause()));
   });
 </script>
 

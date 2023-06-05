@@ -22,6 +22,9 @@ export class WaveOscillatorNode {
   connect(destinationNode: AudioNode) {
     this.wave.connect(destinationNode);
   }
+  disconnect() {
+    this.wave.disconnect();
+  }
   set frequency(frequency: number) {
     if (this.wave && this.wave.buffer) {
       this.wave.playbackRate.setValueAtTime(
@@ -36,6 +39,15 @@ export class WaveOscillatorNode {
         this.wave.start();
       } catch {
         console.warn('Already started');
+      }
+    }
+  }
+  stop() {
+    if (this.wave) {
+      try {
+        this.wave.stop();
+      } catch {
+        console.warn('Unable to stop');
       }
     }
   }
