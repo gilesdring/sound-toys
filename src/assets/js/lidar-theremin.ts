@@ -66,7 +66,7 @@ export class LidarTheremin {
       minOctave: -2,
       referenceTone: 440,
     });
-    const gainScaler = (y: number) => (1 - y) ** 3;
+    const gainScaler = (y: number) => (1 - y) * 0.5;
 
     // Sample terrain and draw overlay when cursor has moved
     addEventListener("cursorMoved", (e) => {
@@ -77,6 +77,7 @@ export class LidarTheremin {
       }
       if (cursor === this.playHead) {
         this.synth.setPitch(pitchScaler(this.playHead.x));
+        console.log(this.playHead);
         this.synth.setGain(gainScaler(this.playHead.y));
         this.drawOverlay();
       }
