@@ -1,6 +1,7 @@
 import { bufferFactory } from "../../../lib/util/buffer-factory.ts";
 
 import { WaveOscillatorNode } from "../../../lib/node/wave-oscillator-node.ts";
+import { CrossFader } from "../../../lib/node/cross-fader.ts";
 
 const noise = Array.from(new Array(1024)).map(() => Math.random() * 256);
 const sine = Array.from(new Array(1024))
@@ -23,10 +24,28 @@ master.gain.setValueAtTime(0.3, audioContext.currentTime);
 wave.connect(master)
 master.connect(audioContext.destination);
 
+const crossFader = new CrossFader(audioContext, { time: 0.1 });
+crossFader.connect(master);
+
+const fadeSources: Record<string, () => OscillatorNode> = {};
+
+fadeSources.triangle = () => {
+  const source = audioContext.createOscillator();
+  source.type = 'triangle';
+  source.frequency.value = 440;
+  return source;
+}
+
+fadeSources.square = () => {
+  const source = audioContext.createOscillator();
+  source.type = 'square';
+  source.frequency.value = 440;
+  return source;
+}
+
 addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-action="start"]').forEach(x => {
     x.addEventListener('click', () => {
-      wave.start();
       audioContext.resume();
     })
   })
@@ -37,6 +56,7 @@ addEventListener('DOMContentLoaded', () => {
   })
   document.querySelectorAll('[data-frequency]').forEach(x => {
     x.addEventListener('click', function () {
+      wave.start();
       wave.frequency = this.dataset.frequency
     })
   })
@@ -48,4 +68,12 @@ addEventListener('DOMContentLoaded', () => {
       audioContext.resume();
     })
   })
+
+  document.querySelectorAll('[data-fade]').forEach(x => {
+    x.addEventListener('click', function () {
+      audioContext.resume();
+      crossFader.source = fadeSources[this.dataset.fade]();
+    })
+  })
 })
+

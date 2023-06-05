@@ -1,4 +1,6 @@
-export class WaveOscillatorNode {
+import { SimpleAudioNode } from "../util/simple-audio-node.ts";
+
+export class WaveOscillatorNode implements SimpleAudioNode {
   readonly context: AudioContext;
   
   private wave: AudioBufferSourceNode
@@ -20,10 +22,10 @@ export class WaveOscillatorNode {
     return this.wave.buffer;
   }
   connect(destinationNode: AudioNode) {
-    this.wave.connect(destinationNode);
+    return this.wave.connect(destinationNode);
   }
   disconnect() {
-    this.wave.disconnect();
+    return this.wave.disconnect();
   }
   set frequency(frequency: number) {
     if (this.wave && this.wave.buffer) {
@@ -36,7 +38,7 @@ export class WaveOscillatorNode {
   start() {
     if (this.wave && this.wave.buffer) {
       try {
-        this.wave.start();
+        return this.wave.start();
       } catch {
         console.warn('Already started');
       }
@@ -45,7 +47,7 @@ export class WaveOscillatorNode {
   stop() {
     if (this.wave) {
       try {
-        this.wave.stop();
+        return this.wave.stop();
       } catch {
         console.warn('Unable to stop');
       }

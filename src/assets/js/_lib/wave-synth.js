@@ -1,9 +1,12 @@
 import { bufferFactory } from "../../../../lib/util/buffer-factory.ts";
 import { audioContext } from "./audio-subsystem.js";
 import { WaveOscillatorNode } from "../../../../lib/node/wave-oscillator-node.ts";
+import { CrossFader } from "../../../../lib/node/cross-fader.ts";
 
 export class WaveSynth {
   constructor() {
+    this.xfader = new CrossFader(audioContext, { time: 0.1 });
+
     this.gainNode = audioContext.createGain();
     this.limiter = audioContext.createDynamicsCompressor();
 
@@ -13,6 +16,7 @@ export class WaveSynth {
     this.limiter.ratio.setValueAtTime(20.0, audioContext.currentTime);
     this.limiter.release.setValueAtTime(0.1, audioContext.currentTime);
 
+    this.xfader.connect(this.gainNode);
     this.gainNode.connect(this.limiter);
     this.limiter.connect(audioContext.destination);
     
@@ -27,6 +31,7 @@ export class WaveSynth {
   }
 
   setWavetable(wave) {
+    if (this.xfader.active) return;
     this.buffer = bufferFactory({ samples: wave });
 
     dispatchEvent(
@@ -48,42 +53,18 @@ export class WaveSynth {
   }
 
   loadWavetable() {
-    const rampTime = 0.2;
-
-    const createSource = (buffer, rampTime, pitch) => {
+    const createSource = (buffer, pitch) => {
       const wave = new WaveOscillatorNode(audioContext);
-      const gainNode = audioContext.createGain();
       wave.buffer = buffer;
       wave.frequency = pitch;
-      // Connect source to gain.
-      wave.connect(gainNode);
-      // Connect gain to destination.
-      gainNode.connect(this.gainNode);
-      gainNode.gain.setValueAtTime(0.001, audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(
-        1,
-        audioContext.currentTime + rampTime,
-      );
-      wave.start();
       return {
-        fadeOut: () => {
-          gainNode.gain.linearRampToValueAtTime(
-            0.00,
-            audioContext.currentTime + rampTime,
-          );
-          setTimeout(() => {
-            wave.stop();
-            wave.disconnect();
-          }, rampTime * 1000);
-        },
         get wave() {
           return wave;
         }
       };
     };
-    const oldSource = this.source;
-    if (oldSource) oldSource.fadeOut();
-    this.source = createSource(this.buffer, rampTime, this.requestedPitch);
+    this.source = createSource(this.buffer, this.requestedPitch);
+    this.xfader.source = this.source.wave;
   }
 
   play() {
@@ -104,7 +85,7 @@ export class WaveSynth {
     );
   }
   stop() {
-    this.source?.fadeOut();
+    this.xfader.fadeOut();
     this.setGain(0);
   }
   fadeOut(decay = 0.5) {

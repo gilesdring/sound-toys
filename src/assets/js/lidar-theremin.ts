@@ -77,7 +77,6 @@ export class LidarTheremin {
       }
       if (cursor === this.playHead) {
         this.synth.setPitch(pitchScaler(this.playHead.x));
-        console.log(this.playHead);
         this.synth.setGain(gainScaler(this.playHead.y));
         this.drawOverlay();
       }
