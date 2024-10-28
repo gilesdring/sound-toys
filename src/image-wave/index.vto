@@ -21,10 +21,10 @@ refs:
   <canvas id="waveform"></canvas>
 </section>
 
-<script src="/assets/js/image-wave.js"></script>
-<script>
+<script type="module">
+  import { ImageWave } from '/assets/js/image-wave.js';
   addEventListener('DOMContentLoaded', () => {
-    soundToys.ImageWave.init({
+    ImageWave.init({
       initialImage: '{{ "/assets/images/LIDAR-DTM-2M-SD84sw.png" |> url }}',
     });
   });

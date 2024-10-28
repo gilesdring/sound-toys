@@ -59,10 +59,10 @@ title: Lidar Theremin
   <canvas id="oscilloscope"></canvas>
 </div>
 
-<script src="/assets/js/lidar-theremin.js"></script>
-<script>
+<script type="module">
+  import { init } from "/assets/js/lidar-theremin.js";
   addEventListener('DOMContentLoaded', () => {
-    soundToys.init({
+    init({
       initialImage: '{{ "/assets/images/LIDAR-DTM-2M-SD84sw.png" |> url }}',
       ui: {
         controls: {

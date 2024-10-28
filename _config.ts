@@ -13,9 +13,8 @@ const site = lume({
 site
   .use(esbuild({
     options: {
-      format: "iife",
-      globalName: "soundToys",
-      // minify: true,
+      treeShaking: true,
+      minify: true,
     },
   }))
   .use(transformImages())
