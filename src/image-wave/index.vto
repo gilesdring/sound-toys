@@ -1,5 +1,5 @@
 ---
-layout: layouts/base.njk
+layout: layouts/base.vto
 title: Image Wave
 refs:
 - https://coderwall.com/p/jzdmdq/loading-image-from-local-file-into-javascript-and-getting-pixel-data
@@ -28,7 +28,7 @@ refs:
 <script>
   addEventListener('DOMContentLoaded', () => {
     soundToys.ImageWave.init({
-      initialImage: '{{ "/assets/images/LIDAR-DTM-2M-SD84sw.png" | url }}',
+      initialImage: '{{ "/assets/images/LIDAR-DTM-2M-SD84sw.png" |> url }}',
     });
   });
 </script>

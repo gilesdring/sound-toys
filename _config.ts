@@ -1,7 +1,7 @@
 import lume from "lume/mod.ts";
 import base_path from "lume/plugins/base_path.ts";
 import esbuild from "lume/plugins/esbuild.ts";
-import imagick from "lume/plugins/imagick.ts";
+import transformImages from "lume/plugins/transform_images.ts";
 import postcss from "lume/plugins/postcss.ts";
 
 const site = lume({
@@ -17,7 +17,7 @@ site
       // minify: true,
     },
   }))
-  .use(imagick())
+  .use(transformImages())
   .use(base_path())
   .use(postcss());
   // .copy([".png", ".jpg"]);

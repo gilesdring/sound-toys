@@ -1,5 +1,4 @@
 ---
-layout: layouts/base.njk
 title: Lidar Theremin
 ---
 <style>
@@ -66,7 +65,7 @@ title: Lidar Theremin
 <script>
   addEventListener('DOMContentLoaded', () => {
     soundToys.init({
-      initialImage: '{{ "/assets/images/LIDAR-DTM-2M-SD84sw.png" | url }}',
+      initialImage: '{{ "/assets/images/LIDAR-DTM-2M-SD84sw.png" |> url }}',
       ui: {
         controls: {
           image: 'image',

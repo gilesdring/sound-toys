@@ -1,0 +1,2 @@
+transformImages:
+  resize: [1000]
