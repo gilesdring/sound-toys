@@ -1,5 +1,4 @@
 ---
-layout: layouts/page.vto
 title: Sound Toys
 ---
 
