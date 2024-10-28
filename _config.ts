@@ -24,4 +24,6 @@ site
   .use(postcss());
   // .copy([".png", ".jpg"]);
 
+site.copy('/assets/fonts');
+
 export default site;

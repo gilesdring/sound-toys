@@ -1,0 +1,7 @@
+scripts:
+  get-fonts:
+    cmd: scripts/get-fonts.ts overpass
+    allow:
+      net: [api.fontsource.org, r2.fontsource.org]
+      read: [.]
+      write: [src/assets]

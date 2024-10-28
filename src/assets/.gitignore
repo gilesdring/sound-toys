@@ -1,0 +1,6 @@
+/fonts/*/ttf
+/fonts/*/webfonts/*
+
+!/fonts/overpass/webfonts/*latin-200*
+!/fonts/overpass/webfonts/*latin-400*
+!/fonts/overpass/webfonts/*latin-700*
