@@ -2,17 +2,19 @@
 title: XY Theremin
 ---
 <aside>
-  <p>Click or touch on the grey area play.</p>
-  <p>Move left and right to change pitch.</p>
-  <p>Move up and down to change volume.</p>
-  <p>Click again or release your finger to stop.</p>
+  <p>
+    Click or touch on the grey area play.
+    Move left and right to change pitch. 
+    Move up and down to change volume.
+    Click again or release your finger to stop.
+  </p>
 </aside>
-<main role="main">
-  <div id="control-surface"></div>
-  <section id="visualisation">
-    {{# <canvas id="waveform"></canvas> #}}
-    <canvas id="oscilloscope"></canvas>
-  </section>
-  <div id="info"></div>
-</main>
+
+<div id="control-surface" class="narrow"></div>
+<section id="visualisation" class="narrow">
+  {{# <canvas id="waveform"></canvas> #}}
+  <canvas id="oscilloscope"></canvas>
+</section>
+<div id="info" class="narrow"></div>
+
 <script src="/assets/js/xy-theremin.js"></script>

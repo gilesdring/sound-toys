@@ -4,16 +4,29 @@
   padding: 0;
 }
 
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: orange;
+}
+
 body > * {
   margin-left: auto;
   margin-right: auto;
-  padding: 0.5em 1em;
-  background: orange;
-  max-width: 720px;
+  box-sizing: border-box;
+  width: 100vw;
+  padding: 0.5rem 1rem;
 }
 
 main {
   padding: 1em;
+  flex-grow: 1;
 }
 
 ul {
@@ -65,4 +78,9 @@ body > header > h1 {
   &.spectrum {
     background: rgb(50, 0, 0);
   } 
+}
+
+.narrow {
+  max-width: 720px;
+  margin-inline: auto;
 }

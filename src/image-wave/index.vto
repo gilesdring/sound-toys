@@ -4,24 +4,22 @@ refs:
 - https://coderwall.com/p/jzdmdq/loading-image-from-local-file-into-javascript-and-getting-pixel-data
 - https://www.freecodecamp.org/news/how-displaying-an-image-on-html5-canvas-works-13e3f6a6c4bd/
 ---
-<main role="main">
-  <section id="control">
-    <p>
-      <label for="myFile">Load image: </label><input type="file" id="myFile" />
-    </p>
-    <p>
-      <button data-action='start'>Start noise</button>
-      <button data-action='stop'>Stop noise</button>
-    </p>
-  </section>
-  <section id="selector">
-    <img id="image">
-    <canvas id="source"></canvas>
-  </section>
-  <section>
-    <canvas id="waveform"></canvas>
-  </section>
-</main>
+<section id="control" class="narrow">
+  <p>
+    <label for="myFile">Load image: </label><input type="file" id="myFile" />
+  </p>
+  <p>
+    <button data-action='start'>Start noise</button>
+    <button data-action='stop'>Stop noise</button>
+  </p>
+</section>
+<section class="narrow" id="selector">
+  <img id="image">
+  <canvas id="source"></canvas>
+</section>
+<section class="narrow">
+  <canvas id="waveform"></canvas>
+</section>
 
 <script src="/assets/js/image-wave.js"></script>
 <script>

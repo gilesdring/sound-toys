@@ -1,0 +1,26 @@
+---
+css: |
+    [data-comp=SiteNav] {
+        color: yellow;
+        background: black;
+        & ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            overflow-x: scroll;
+        }
+        & a {
+            color: inherit;
+        }
+    }
+---
+<nav data-comp="SiteNav">
+    <ul>
+        {{ for p of search.pages("url!=/", "title") }}
+            <li><a href="{{ p.url }}">{{ p.title }}</a></li>
+        {{ /for }}
+    </ul>
+</nav>

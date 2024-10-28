@@ -32,34 +32,32 @@ title: Lidar Theremin
   }
 </style>
 
-<main role="main">
-  <div id="control">
-    <fieldset id="mode-selector">
-      <legend for="mode-selector">Mode:</legend>
-      <div>
-        <input type="radio" id="play-mode" name="mode" value="play"></input>
-        <label for="play-mode">Play the landscape</label>
-      </div>
-      <div>
-        <input type="radio" id="sample-mode" name="mode" value="sample"></input>
-        <label for="sample-mode">Sample the landscape</label>
-      </div>
-    </fieldset>
-    <fieldset id="play-params">
-      <legend>Play settings:</legend>
-      <div>
-        <input type="checkbox" id="play-sticky" name="sticky"></input>
-        <label for="play-sticky">Keep the note on</label>
-      </div>
-    </fieldset>
-  </div>
-  <div id="image"class="pane no-top-margin">
-  </div>
-  <div id="visualisation" class="no-top-margin">
-    <canvas id="waveform"></canvas>
-    <canvas id="oscilloscope"></canvas>
-  </div>
-</main>
+<div id="control" class="narrow">
+  <fieldset id="mode-selector">
+    <legend for="mode-selector">Mode:</legend>
+    <div>
+      <input type="radio" id="play-mode" name="mode" value="play"></input>
+      <label for="play-mode">Play the landscape</label>
+    </div>
+    <div>
+      <input type="radio" id="sample-mode" name="mode" value="sample"></input>
+      <label for="sample-mode">Sample the landscape</label>
+    </div>
+  </fieldset>
+  <fieldset id="play-params">
+    <legend>Play settings:</legend>
+    <div>
+      <input type="checkbox" id="play-sticky" name="sticky"></input>
+      <label for="play-sticky">Keep the note on</label>
+    </div>
+  </fieldset>
+</div>
+<div id="image" class="pane no-top-margin narrow">
+</div>
+<div id="visualisation" class="no-top-margin narrow">
+  <canvas id="waveform"></canvas>
+  <canvas id="oscilloscope"></canvas>
+</div>
 
 <script src="/assets/js/lidar-theremin.js"></script>
 <script>

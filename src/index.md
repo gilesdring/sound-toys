@@ -1,5 +1,6 @@
 ---
 title: Sound Toys
+layout: layouts/base.vto
 ---
 
 Experiments with sound in the browser:
