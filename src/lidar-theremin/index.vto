@@ -60,7 +60,7 @@ title: Lidar Theremin
 </div>
 
 <script type="module">
-  import { init } from "/assets/js/lidar-theremin.js";
+  import { init } from '{{ "/assets/js/lidar-theremin.js" |> url }}';
   addEventListener('DOMContentLoaded', () => {
     init({
       initialImage: '{{ "/assets/images/LIDAR-DTM-2M-SD84sw.png" |> url }}',

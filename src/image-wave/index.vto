@@ -22,7 +22,7 @@ refs:
 </section>
 
 <script type="module">
-  import { ImageWave } from '/assets/js/image-wave.js';
+  import { ImageWave } from '{{ "/assets/js/image-wave.js" |> url }}';
   addEventListener('DOMContentLoaded', () => {
     ImageWave.init({
       initialImage: '{{ "/assets/images/LIDAR-DTM-2M-SD84sw.png" |> url }}',
